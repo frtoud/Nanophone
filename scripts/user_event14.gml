@@ -1299,11 +1299,12 @@ if !phone.lightweight
 		visible = true;
 	}
 	
-	if phone.supports_fast_graphics{
+	if (phone.supports_fast_graphics)
+    {
 		phone_fast = phone.utils[phone.UTIL_FAST].on;
 	
 		if !phone_fast && ((!phone_online && fps_real < 60) || (phone_online && keyboard_key == 112)) && !phone.state && !phone.dont_fast && state != PS_SPAWN && (state != PS_IDLE || state_timer > 5){
-			if phone_lagging < 1 phone_lagging += 0.2;
+			if (phone_lagging < 1) phone_lagging += 0.2;
 			else{
 				if (phone_online && keyboard_key == 48){
 					print_debug("FAST GRAPHICS ENABLED - F1 KEY PRESSED");
@@ -1317,16 +1318,14 @@ if !phone.lightweight
 				phone_lagging = 1;
 			}
 		}
-		else if phone_lagging != 1 phone_lagging = 0;
-		
-		if phone.utils_cur_updated[phone.UTIL_DMG_FREEZE]{
-			phone.utils_cur_updated[phone.UTIL_DMG_FREEZE] = 0;
-			phone_frozen_damage = get_player_damage(player);
-		}
+		else if (phone_lagging != 1) phone_lagging = 0;
 	}
 
-	if array_length(phone_dust_query){
-		for(var i = 0; i < array_length(phone_dust_query); i++){
+    //Spawn basegame dust fx
+	if array_length(phone_dust_query)
+    {
+		for(var i = 0; i < array_length(phone_dust_query); i++)
+        {
 			var cur = phone_dust_query[i];
 			spawn_base_dust(cur[0], cur[1], cur[2], cur[3]);
 		}
@@ -1334,16 +1333,24 @@ if !phone.lightweight
 	}
 } // END LIGHTWEIGHT
 
-if phone_practice{
+//=============================================================================
+//Phone utilities
+if (phone_practice)
+{
+    if (phone.utils_cur_updated[phone.UTIL_DMG_FREEZE])
+    {
+        phone.utils_cur_updated[phone.UTIL_DMG_FREEZE] = 0;
+        phone_frozen_damage = get_player_damage(player);
+    }
+    if (phone.utils_cur[phone.UTIL_DMG_FREEZE])
+    { set_player_damage(player, phone_frozen_damage); }
 
-	if phone.utils_cur[phone.UTIL_DMG_FREEZE]{
-		set_player_damage(player, phone_frozen_damage);
-	}
-	
-	if phone.utils_cur_updated[phone.UTIL_STATE_SAVE]{
+	if (phone.utils_cur_updated[phone.UTIL_STATE_SAVE])
+    {
 		phone.utils_cur_updated[phone.UTIL_STATE_SAVE] = 0;
 		
-		with oPlayer{
+		with (oPlayer)
+        {
 			phone_save_state_x = x;
 			phone_save_state_y = y;
 			phone_save_state_spr_dir = spr_dir;
@@ -1351,36 +1358,43 @@ if phone_practice{
 			spawn_hit_fx(x, y - 32, 301);
 		}
 	}
-	
-	if phone.utils_cur_updated[phone.UTIL_STATE_LOAD]{
+	if (phone.utils_cur_updated[phone.UTIL_STATE_LOAD])
+    {
 		phone.utils_cur_updated[phone.UTIL_STATE_LOAD] = 0;
-	
+
 		var found = 0;
-		
-		with oPlayer{
-			if "phone_save_state_x" in self{
+
+		with (oPlayer)
+        {
+			if ("phone_save_state_x" in self)
+            {
 				x = phone_save_state_x;
 				y = phone_save_state_y;
 				spr_dir = phone_save_state_spr_dir;
 				set_player_damage(player, phone_save_state_dmg);
 				spawn_hit_fx(x, y - 32, 301);
 			}
-			else if !found{
+			else if (!found)
+            {
 				print_debug("Position and damage not saved!");
 				found = 1;
 			}
 		}
 	}
-	
-	if phone.utils_cur[phone.UTIL_CPU] && phone_practice{
-		with oPlayer{
+
+	if (phone.utils_cur[phone.UTIL_CPU])
+    {
+		with (oPlayer)
+        {
 			if (burned && burnt_id.url == CH_ZETTERBURN && get_player_hud_color(burnt_id.player) == c_gray) burned = 0;
-			if get_player_hud_color(player) == c_gray{
+			if (get_player_hud_color(player) == c_gray)
+            {
 				if (url == CH_KRAGG) can_up_b = 0;
 				if (url == CH_FORSBURN) move_cooldown[AT_FSPECIAL] = 2;
 				if (url != CH_MAYPUL) marked = false;
 				if (url != CH_RANNO) poison = 0;
-				if (url == CH_SHOVEL_KNIGHT){
+				if (url == CH_SHOVEL_KNIGHT)
+                {
 					gems = 0;
 					if (state == PS_ATTACK_AIR && window == 1 && window_timer == 1){
 						set_num_hitboxes(AT_USPECIAL, 0);
@@ -1390,9 +1404,14 @@ if phone_practice{
 			}
 		}
 	}
-	
-	if phone.utils_cur[phone.UTIL_PARRY]{
-		with oPlayer if self != other && state == PS_PARRY && window == 1 && !hitpause && !invincible window_timer = 1;
+
+	if (phone.utils_cur[phone.UTIL_PARRY])
+    {
+		with (oPlayer) if (self != other) 
+        && (state == PS_PARRY && window == 1 && !hitpause && !invincible) 
+        {
+            window_timer = 1;
+        }
 	}
 }
 
