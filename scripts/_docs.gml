@@ -376,29 +376,40 @@ USER FEATURES
   Reloading frame data
 
  Cheats page
-  - Rename to "Extras"
-  - Add Rune control
+  + Rename to "Extras"
+  + Add Rune control
 
 
  Utilities
+  - utils_cur
+  - utils_cur_updated
   Low FPS Warning
-   - Move to Preferences
+   + Move to Preferences
   Opaque Background
-   - Move to Preferences
+   + Move to Preferences
   Freeze Damage
-  Save Pos
-  Load Pos
+   - phone_frozen_damage
+  Save/Load Pos
+   - phone_save_state_x
+   - phone_save_state_y
+   - phone_save_state_spr_dir
+   - phone_save_state_dmg
   Greenscreen
   Endless Parry
   Spam Attack
   CPU Behavior Change
 
- - Add PREFERENCES
-  - Saved persistently
+ + Add PREFERENCES
+  + Saved persistently
 
 VISUALS
  OPENING HINT
  - phone.has_opened_yet
+
+ PHONE ITSELF
+ - Mask utilities
+ - TextDraw
+ - RectDraw
 
 CODE FEATURES
  Lightweighted
@@ -409,13 +420,24 @@ CODE FEATURES
    - muno_char_icon
    - phone_ditto
   - phone_landing
+  - phone_attacking
+  - phone_window_end
 
  OFFSCREEN INDICATORS
   - phone_offscreen
 
+ DUST QUERY
+  - phone_dust_query
+  - spawn_base_dust()
+
+ SOUND STOP
+  - phone_attacking
+  - phone_stopped_sounds
+
 DEPENDENCIES
 
-
+ Mask utilities
+ TextDraw, RectDraw
 
 NOTES
  - Need focus switch to big screen for Runes settings

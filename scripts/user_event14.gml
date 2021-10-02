@@ -60,12 +60,16 @@ phone_darkened_player_color = make_color_rgb(
 	);
 
 // character state info
-phone_attacking = 0;
-phone_window_end = 0;
-phone_landing = 0;
+phone_attacking = false; // is in attacking state
+phone_window_end = 0;    // tracks length of current window if (phone_attacking)
+phone_landing = 0;       // tracks "once per airtime" condition (getting hit, walljump, landing)
+
+//code features toggle
 phone_lightweight = 0;
-phone_offscreen = [];
-phone_dust_query = [];
+
+//Request arrays
+phone_offscreen = []; //list of objects to track in offscreen indicators
+phone_dust_query = []; //list of requests for spawn_base_dust()
 
 // attack info
 phone_invul_override = 0;
@@ -1186,29 +1190,39 @@ if !phone.lightweight
 	
 	phone_landing = (!free || state == PS_WALL_JUMP || state_cat == SC_HITSTUN || state == PS_RESPAWN);
 	
-	if (state == PS_ATTACK_AIR || state == PS_ATTACK_GROUND){
-		phone_attacking = 1;
+	if (state == PS_ATTACK_AIR || state == PS_ATTACK_GROUND)
+    {
+		phone_attacking = true;
 		phone_window_end = floor(get_window_value(attack, window, AG_WINDOW_LENGTH) * ((get_window_value(attack, window, AG_WINDOW_HAS_WHIFFLAG) && !has_hit) ? 1.5 : 1));
 	}
-	else{
-		if phone_attacking && (state == PS_LANDING_LAG || state == PS_PRATLAND || state_cat == SC_HITSTUN || !visible){
-			if !array_equals(phone_stopped_sounds, []){
-				for (var ii = 0; ii < array_length(phone_stopped_sounds); ii++){
+	else
+    {
+		if (phone_attacking)
+        && (state == PS_LANDING_LAG || state == PS_PRATLAND || state_cat == SC_HITSTUN || !visible)
+        {
+			if !array_equals(phone_stopped_sounds, [])
+            {
+				for (var ii = 0; ii < array_length(phone_stopped_sounds); ii++)
+                {
 					sound_stop(phone_stopped_sounds[ii]);
 				}
 				phone_stopped_sounds = [];
 			}
 		}
-		phone_attacking = 0;
+		phone_attacking = false;
 	}
 	
-	if phone_attacking{
-		if phone_using_invul && !phone_invul_override && array_find_index(muno_invul_checked, attack) != -1{
+	if phone_attacking
+    {
+        //special invulnerability 
+		if phone_using_invul && !phone_invul_override && array_find_index(muno_invul_checked, attack) != -1
+        {
 			super_armor = false;
 			invincible = false;
 			soft_armor = 0;
 			
-			switch(get_window_value(attack, window, AG_MUNO_WINDOW_INVUL)){
+			switch(get_window_value(attack, window, AG_MUNO_WINDOW_INVUL))
+            {
 				case -1:
 					invincible = true;
 					break;
@@ -1415,17 +1429,19 @@ if (phone_practice)
 	}
 }
 
+//=============================================================================
 // phone logic
-
-if phone_practice switch(phone.state){
+if (phone_practice) switch(phone.state)
+{
 	case 0: // closed
 		phone.y = phone.lowered_y;
 		break;
 	case 1: // opening
 		var s_t_max = 15;
 		phone.y = ease_backOut(phone.lowered_y, 0, phone.state_timer, s_t_max, 1);
-		if phone.app == 0 phone.cursor = 1;
-		if phone.state_timer >= s_t_max{
+		if (phone.app == phone.APP_HOME) phone.cursor = 1;
+		if (phone.state_timer >= s_t_max)
+        {
 			setPhoneState(2);
 			phone.has_opened_yet = true;
 		}
@@ -1517,18 +1533,28 @@ if phone_practice switch(phone.state){
 		break;
 }
 
-if phone_practice phoneBigScreen(phone.app == clamp(phone.app, phone.APP_TIPS, phone.APP_UTILS) && array_length(phone.apps[phone.app].array));
+if (phone_practice)
+{
+    //No big screen for Home & Power
+    phoneBigScreen(phone.app == clamp(phone.app, phone.APP_TIPS, phone.APP_UTILS) 
+                                    && array_length(phone.apps[phone.app].array));
+}
 else phone.big_screen_pos_offset = 1;
 
-if ((state == PS_ATTACK_AIR || state == PS_ATTACK_GROUND) && attack == AT_PHONE){
+//=============================================================================
+// Phone "Attack" logic
+if ((state == PS_ATTACK_AIR || state == PS_ATTACK_GROUND) && attack == AT_PHONE)
+{
 	soft_armor = 9999;
-	if (window == 2){
+	if (window == 2)
+    {
 		hsp = 0;
 		vsp = 0;
 		can_move = false;
 		can_fast_fall = false;
 		
-		switch(phone.state){
+		switch(phone.state)
+        {
 			case 0:
 			case 3:
 				window++;
@@ -1540,19 +1566,16 @@ if ((state == PS_ATTACK_AIR || state == PS_ATTACK_GROUND) && attack == AT_PHONE)
 
 //Animation timers
 phone.state_timer++;
-if phone.click_bump_timer{
-	phone.click_bump_timer--;
-}
-if phone.app_icon_slide_timer{
-	phone.app_icon_slide_timer--;
-}
-if phone.cursor_change_timer{
-	phone.cursor_change_timer--;
-}
-if phone.page_change_timer{
-	phone.page_change_timer--;
-}
+if (phone.click_bump_timer > 0)
+{ phone.click_bump_timer--; }
+if (phone.app_icon_slide_timer > 0)
+{ phone.app_icon_slide_timer--; }
+if (phone.cursor_change_timer > 0)
+{ phone.cursor_change_timer--; }
+if (phone.page_change_timer > 0)
+{ phone.page_change_timer--; }
 
+//=============================================================================
 #define phoneBigScreen(should_be_displayed)
 
 phone.big_screen_pos_offset = lerp(phone.big_screen_pos_offset, !should_be_displayed, 0.4);
@@ -1573,17 +1596,19 @@ phone.click_bump_timer = phone.click_bump_timer_max;
 
 phone.page_change_timer = phone.page_change_timer_max;
 
+//=============================================================================
 #define setPhoneApp(n_app)
 {
     phone.app = n_app;
     phone.page = 0;
     phoneClickBump();
 }
-
-#define setPhoneState(n_s)
-
-phone.state = n_s;
-phone.state_timer = 0;
+#define setPhoneState(n_state)
+{
+    phone.state = n_state;
+    phone.state_timer = 0;
+}
+//=============================================================================
 
 #define normalListLogic(ignore_0th)
 
