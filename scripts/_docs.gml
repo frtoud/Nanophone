@@ -381,8 +381,8 @@ USER FEATURES
 
 
  Utilities
-  - utils_cur
-  - utils_cur_updated
+  - phone.utils_cur
+  - phone.utils_cur_updated
   Low FPS Warning
    + Move to Preferences
   Opaque Background
@@ -406,10 +406,19 @@ VISUALS
  OPENING HINT
  - phone.has_opened_yet
 
+ Arrow cooldown darkener
+ - phone_darkened_player_color
+ - phone_arrow_cooldown
+
  PHONE ITSELF
  - Mask utilities
  - TextDraw
  - RectDraw
+
+CSS NAMES
+ - use_alt_names
+ - alt_ui_recolor
+ - detect_online()
 
 CODE FEATURES
  Lightweighted
@@ -438,6 +447,12 @@ DEPENDENCIES
 
  Mask utilities
  TextDraw, RectDraw
+ detect_online
+ spawn_base_dust
+
+USER CONTROL VARIABLES
+ use_alt_names
+ alt_ui_recolor
 
 NOTES
  - Need focus switch to big screen for Runes settings

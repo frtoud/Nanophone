@@ -93,10 +93,7 @@ phone_blastzone_b = get_stage_data(SD_Y_POS) + get_stage_data(SD_BOTTOM_BLASTZON
 // phone_blastzone_t = get_stage_data(SD_BLASTZONE_TOP_Y);
 // phone_blastzone_b = get_stage_data(SD_BLASTZONE_BOTTOM_Y);
 phone_lagging = false;
-phone_online = 0;
-for (var cur = 0; cur < 4; cur++){
-	if get_player_hud_color(cur+1) == $64e542 phone_online = 1;
-}
+phone_online = detect_online(); //TRUE if in an online match
 
 // phone info
 phone_fast = 0;
@@ -152,7 +149,7 @@ phone = {
 	frame_data_loaded: false,
 	has_opened_yet: false,
 	
-	// timers
+	// animation timers
 	click_bump_timer: 0,
 	click_bump_timer_max: 5,
 	app_icon_slide_timer: 0,
@@ -467,8 +464,11 @@ GIM_COLOR		= 29;
 
 #define CORE_post_draw
 
-if !phone_hud_hidden && draw_indicator{
-	var col = (phone_arrow_cooldown && !(phone_arrow_cooldown - 1 < 25 && (phone_arrow_cooldown - 1) % 10 >= 5)) ? phone_darkened_player_color : get_player_hud_color(player);
+// Darken indicator when on arrow-cooldown
+if (!phone_hud_hidden && draw_indicator)
+{
+	var col = (phone_arrow_cooldown && !(phone_arrow_cooldown - 1 < 25 && (phone_arrow_cooldown - 1) % 10 >= 5)) 
+                ? phone_darkened_player_color : get_player_hud_color(player);
 	draw_sprite_ext(sprite_get("_pho_cooldown_arrow"), 0, x - 7, y - char_height - hud_offset - 28, 1, 1, 0, col, 1);
 }
 
@@ -484,11 +484,6 @@ if !phone_hud_hidden && draw_indicator{
 
 #define CORE_css_draw
 
-var is_online = 0;
-for (var cur = 0; cur < 4; cur++){
-	if get_player_hud_color(cur+1) == $64e542 is_online = 1;
-}
-
 shader_end();
 
 // obsoleted by patch lol
@@ -497,33 +492,37 @@ shader_end();
 draw_sprite_ext(sprite_get("_pho_icon"), 0, x + 6, y + 42, 2, 2, 0, c_white, 1);
 
 // Alt costume
-
-var alt_cur = get_player_color(player);
 user_event(15);
 
 rectDraw(x + 10, y + 10, 202, 6, c_black);
 
+var alt_cur = get_player_color(player);
 var offset = (alt_cur > 15) * 16;
 
-var col = alt_ui_recolor == noone ? c_white : make_color_rgb(get_color_profile_slot_r(alt_cur, alt_ui_recolor), get_color_profile_slot_g(alt_cur, alt_ui_recolor), get_color_profile_slot_b(alt_cur, alt_ui_recolor));
- 
-for(i = 0; i < (num_alts - offset) && i < 16; i++){
+//Special color
+var col = (alt_ui_recolor == noone) ? c_white : make_color_rgb(get_color_profile_slot_r(alt_cur, alt_ui_recolor), 
+                                                               get_color_profile_slot_g(alt_cur, alt_ui_recolor),
+                                                               get_color_profile_slot_b(alt_cur, alt_ui_recolor));
+
+//Alt rectangles
+for(i = 0; i < (num_alts - offset) && i < 16; i++)
+{
 	var draw_color = (i == alt_cur - offset) ? col : c_gray * 0.5;
 	var draw_x = x + 78 + 8 * i;
 	rectDraw(draw_x, y + 10, 6, 4, draw_color);
 }
 
+//Alt number
 var txt = "#" + string(alt_cur);
-
 rectDraw(x + 76, y + 15, 42, 21, c_black);
-
 textDraw(x + 82, y + 19, "fName", col, 20, 1000, fa_left, 1, false, 1, txt, false);
 
-if use_alt_names{
-	if alt_cur < array_length(alt_names) && alt_names[alt_cur] != ""{
-		rectDraw(x + 10, y + 142 - is_online * 12, string_width_ext(alt_names[alt_cur], 1000, 200), 10, c_black);
-		textDraw(x + 10, y + 141 - is_online * 12, "fName", col, 1000, 200, fa_left, 1, true, 1, alt_names[alt_cur], false);
-	}
+//Alt color names
+if (use_alt_names) && (alt_cur < array_length(alt_names)) && (alt_names[alt_cur] != "")
+{
+    var is_online = detect_online();
+    rectDraw(x + 10, y + 142 - is_online * 12, string_width_ext(alt_names[alt_cur], 1000, 200), 10, c_black);
+    textDraw(x + 10, y + 141 - is_online * 12, "fName", col, 1000, 200, fa_left, 1, true, 1, alt_names[alt_cur], false);
 }
 
 
@@ -541,55 +540,67 @@ if use_alt_names{
 //Offscreen indicators
 if !array_equals(phone_offscreen, [])
 {
-	
 	var spr_pho_offscreen = sprite_get("_pho_offscreen");
-	
-	var empty = 1;
-	
-	for (var i = 0; i < array_length(phone_offscreen); i++){
-		if phone_offscreen[i] != noone{
-			empty = 0;
-			if !instance_exists(phone_offscreen[i]){
-				phone_offscreen[i] = noone;
-			}
-			else with phone_offscreen[i]{
+
+	var empty = true;
+
+	for (var i = 0; i < array_length(phone_offscreen); i++)
+    {
+		if (phone_offscreen[i] != noone)
+        {
+			empty = false;
+			if !instance_exists(phone_offscreen[i])
+            { phone_offscreen[i] = noone; }
+			else with (phone_offscreen[i])
+            {
 				var leeway = phone_offscr_leeway;
-				
+
 				var x_ = x + phone_offscr_x_offset * spr_dir;
 				var y_ = y + phone_offscr_y_offset;
-				
+
 				var off_l = x_ < view_get_xview() - leeway;
 				var off_r = x_ > view_get_xview() + view_get_wview() + leeway;
 				var off_u = y_ < view_get_yview() - leeway;
 				var off_d = y_ > view_get_yview() + view_get_hview() - 52 + leeway;
-				
+
 				var margin = 34;
+
+                //Check which direction offscreen bubble points towards  
 				var idx = noone;
-				
-				if off_l{
+				if (off_l)
+                {
 					idx = 0;
-					if off_u idx = 1;
-					if off_d idx = 7;
+					if (off_u) idx = 1;
+					if (off_d) idx = 7;
 				}
-				else if off_r{
+				else if (off_r)
+                {
 					idx = 4;
-					if off_u idx = 3;
-					if off_d idx = 5;
+					if (off_u) idx = 3;
+					if (off_d) idx = 5;
 				}
-				else if off_u idx = 2;
-				else if off_d idx = 6;
-				
-				if idx != noone{
-					draw_sprite_ext(spr_pho_offscreen, idx, clamp(x_ - view_get_xview(), margin, view_get_wview() - margin) - 32, clamp(y_ - view_get_yview(), margin, view_get_hview() - 52 - margin) - 32, 2, 2, 0, get_player_hud_color(player), 1);
+				else if (off_u) idx = 2;
+				else if (off_d) idx = 6;
+
+				if (idx != noone)
+                {
+					draw_sprite_ext(spr_pho_offscreen, idx, 
+                                    clamp(x_ - view_get_xview(), margin, view_get_wview() - margin) - 32, 
+                                    clamp(y_ - view_get_yview(), margin, view_get_hview() - 52 - margin) - 32, 
+                                    2, 2, 0, get_player_hud_color(player), 1);
+
 					with other shader_start();
-					draw_sprite_ext(phone_offscr_sprite, phone_offscr_index, clamp(x_ - view_get_xview(), margin, view_get_wview() - margin) - 32, clamp(y_ - view_get_yview(), margin, view_get_hview() - 52 - margin) - 32, 2, 2, 0, c_white, 1);
+					draw_sprite_ext(phone_offscr_sprite, phone_offscr_index, 
+                                    clamp(x_ - view_get_xview(), margin, view_get_wview() - margin) - 32, 
+                                    clamp(y_ - view_get_yview(), margin, view_get_hview() - 52 - margin) - 32, 
+                                    2, 2, 0, c_white, 1);
 					with other shader_end();
 				}
 			}
 		}
 	}
-	
-	if empty phone_offscreen = [];
+
+	if (empty) phone_offscreen = [];
 }
 
 // FPS notification
@@ -635,7 +646,8 @@ if (phone.app == phone.APP_HOME)
 		drawAppIcon(app_x, app_y, i, app_sel);
 	}
 }
-else if phone.app == phone.APP_POWER{
+else if (phone.app == phone.APP_POWER)
+{
 	var text_x = phone_x + phone.screen_width / 2 + 1 - ease_backIn(0, phone.screen_width, phone.app_icon_slide_timer, phone.app_icon_slide_timer_max, 1);
 	var text_y = phone_y + 65;
 	
@@ -649,21 +661,24 @@ else if phone.app == phone.APP_POWER{
 	text_y += phone.last_text_size.height * 2;
 	textDraw(text_x, text_y, "fName", c_white, 18, phone.screen_width, fa_center, 1, false, 1, "Press F5 to turn the Phone back on.", false);
 }
-
-else{
+else
+{
 	var arr = phone.apps[phone.app].array;
 	var text_x = phone_x + phone.screen_width / 2 + 1 - ease_backIn(0, phone.screen_width, phone.app_icon_slide_timer, phone.app_icon_slide_timer_max, 1);
 	
-	if array_length(arr){
+	if array_length(arr)
+    {
 		var text_y = phone_y + 59;
 		text_y -= phone.scroll_dist;
-		for (var i = 0; i < array_length(arr); i++){
+		for (var i = 0; i < array_length(arr); i++)
+        {
 			var sel = phone.cursor == i;
 			textDraw(text_x + sel * phone.cursor_change_timer, text_y, "fName", sel ? c_white : phone.apps[phone.app].color, 18, phone.screen_width - 8, fa_center, 1, sel, 1, arr[i].name, true);
 			text_y += phone.last_text_size.height + 6;
 		}
 	}
-	else{
+	else
+    {
 		var text_y = phone_y + 65;
 		textDraw(text_x, text_y, "fName", c_white, 18, phone.screen_width, fa_center, 1, true, 1, "No " + phone.apps[phone.app].name + "
 		Loaded", true);
@@ -674,7 +689,7 @@ else{
 	rectDraw(phone_x, phone_y, phone.screen_width, 20, phone.apps[phone.app].color_dark);
 }
 
-if phone.app
+if (phone.app > 0)
 {
 	// draw the app's icon at, like, the top of the screen or whatever
 	var app_x = phone_x + 2;
@@ -684,15 +699,19 @@ if phone.app
 
 maskFooter();
 
+//Phone frame
 if (phone.uses_shader) shader_start();
 draw_sprite_ext(sprite_get("_pho_base"), get_gameplay_time() / 4, phone_x - 68, phone_y - 136, 2, 2, 0, c_white, 1);
 if (phone.uses_shader) shader_end();
 
+//=====================================================================
+// Draw app icon #i at position app_x, app_y
+// if app_sel is TRUE, it draws the "selected" state and color
 #define drawAppIcon(app_x, app_y, i, app_sel)
 
-if app_sel{
-	draw_sprite_ext(sprite_get("_pho_app_icons"), 0, app_x, app_y, 2, 2, 0, c_white, 1);
-}
+if (app_sel)
+   draw_sprite_ext(sprite_get("_pho_app_icons"), 0, app_x, app_y, 2, 2, 0, c_white, 1);
+
 draw_sprite_ext(sprite_get("_pho_app_icons"), i, app_x, app_y, 2, 2, 0, c_white, 1);
 textDraw(app_x + 10, app_y + 13, "fName", app_sel ? c_white : phone.apps[i].color, 10000, 200, fa_left, 1, true, 1, phone.apps[i].name, false);
 
@@ -2187,7 +2206,18 @@ if (string_char_at(input, 1) == "0") input = string_delete(input, 1, 1);
 return input;
 
 
-
+//================================================================================
+//return TRUE if detecting an online mode
+#define detect_online()
+{
+    for (var cur = 0; cur < 4; cur++)
+    {
+        if (get_player_hud_color(cur+1) == $64e542) //online-only color 
+            return true;
+    }
+    return false;
+}
+//================================================================================
 #define spawn_base_dust // originally by supersonic
 /// spawn_base_dust(x, y, name, dir = 0)
 ///spawn_base_dust(x, y, name, ?dir)
