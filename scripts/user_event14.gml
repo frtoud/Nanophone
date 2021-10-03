@@ -183,9 +183,9 @@ sfx_pho_power_on = sound_get("_pho_acnh_chime1");
 
 initIndexes();
 
-with phone{
-	
-	phone = self;
+with (phone)
+{
+	phone = self; //redundancy to avoid ambiguity in function calls?
 	
 	APP_HOME		= pho_initApp("Home Screen",	$000000, $000000, apps);
 	APP_TIPS		= pho_initApp("Tips",			$1e82f2, $002eaf, tips);
@@ -196,30 +196,37 @@ with phone{
 	APP_POWER		= pho_initApp("Power",			$f07c27, $bd3200, []);
 }
 
+//user initialization step
 user_event(15);
 
-with phone{
-	if supports_fast_graphics{
-		UTIL_FAST		= pho_initUtil("Graphics", [0, 1], ["Fancy", "Fast"], "This character supports Fast Graphics! This setting disables certain visual effects to make the character run better on lesser hardware. It will trigger automatically (even in VS Mode) if the FPS drops below 60 for about 5+ frames while the MunoPhone is closed.
+with (phone)
+{
+	if (supports_fast_graphics)
+    {
+		UTIL_FAST	= pho_initUtil("Graphics", [0, 1], ["Fancy", "Fast"], 
+        "This character supports Fast Graphics! This setting disables certain visual effects to make the character run better on lesser hardware. It will trigger automatically (even in VS Mode) if the FPS drops below 60 for about 5+ frames while the MunoPhone is closed.
 	
 		In online matches, it won't automatically trigger; instead, press the F1 key on the keyboard to enable Fast Graphics.");
 	}
-	else{
-		dont_fast = true;
-	}
+	else { dont_fast = true; }
 	
 	UTIL_FPS_WARN	= pho_initUtil("Low FPS Warning", [1, 0], ["On", "Off"], "Display an onscreen warning when the game's FPS dips below 60.")
 	UTIL_OPAQUE		= pho_initUtil("Opaque Background", [0, 1, 2], ["Off", "On", "When Focused"], "Draw an opaque background for app content, instead of a transparent one.");
 	UTIL_DMG_FREEZE	= pho_initUtil("Freeze Own Damage", [0, 1], ["Off", "On"], "Prevent the phone user's damage from changing (by constantly setting it back to the initial value).");
 	UTIL_STATE_SAVE	= pho_initUtil("Save Position and Damage", [0], "", "Save the position and damage of all characters.");
 	UTIL_STATE_LOAD	= pho_initUtil("Load Position and Damage", [0], "", "Load the position and damage saved by the previous setting.");
-	UTIL_GREEN		= pho_initUtil("Greenscreen", [0, 1], ["Off", "On"], "Enable a greenscreen that is drawn at the same depth as the phone's content screen.
+	UTIL_GREEN		= pho_initUtil("Greenscreen", [0, 1], ["Off", "On"], 
+    "Enable a greenscreen that is drawn at the same depth as the phone's content screen.
 	
 	(Won't take effect until you put away the phone.)");
-	UTIL_PARRY		= pho_initUtil("Endless Parry", [0, 1], ["Off", "On"], "Causes other players' parry windows to last forever until they successfully parry something.
+
+	UTIL_PARRY		= pho_initUtil("Endless Parry", [0, 1], ["Off", "On"], 
+    "Causes other players' parry windows to last forever until they successfully parry something.
 	
 	Useful for testing the on-parry effects of a move without having to time it perfectly - try setting the CPU to Parry.");
-	UTIL_CPU		= pho_initUtil("CPU Behavior Changes", [1, 0], ["On", "Off"], "Makes changes to some base-game CPUs to make them better training dummies, removing annoying side effects when recovering.
+
+	UTIL_CPU		= pho_initUtil("CPU Behavior Changes", [1, 0], ["On", "Off"], 
+    "Makes changes to some base-game CPUs to make them better training dummies, removing annoying side effects when recovering.
 	
 		Zetterburn, Maypul, and Ranno cannot inflict their status effects.
 		

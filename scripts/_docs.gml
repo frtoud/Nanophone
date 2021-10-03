@@ -375,7 +375,8 @@ KEY:
 
 
 USER FEATURES
- Tips
+ TIPS
+ - initTip()
 
  Patches
 
@@ -475,6 +476,9 @@ DEPENDENCIES
  TextDraw, RectDraw
  detect_online
  spawn_base_dust
+ initTip
+ - phone.tips
+ - phone.currently_edited_obj
 
 USER CONTROL VARIABLES
  use_alt_names
@@ -484,3 +488,50 @@ NOTES
  - Need focus switch to big screen for Runes settings
 
  */
+
+/*
+"CLASS DIAGRAM"
+
+PHONE
+ tips: TIPtype
+ patches: TIPtype
+ utils: UTILtype
+ utils_cur: []
+ utils_cur_updated: [bool]
+
+TIPtype
+ name: string
+ objs: [TIPOBJtype]
+ page_starts: [int]
+
+TIPOBJtype
+ type: int -> [0, 1]
+TIPOBJtype::0
+ text: string
+ align: aligntype
+ color: colortype
+ indent: int
+ side_by_side: bool
+TIPOBJtype::1
+ sprite: spritetype
+ frame: frametype
+ align: aligntype
+ xscale: real
+ yscale: real
+ color: colortype
+ alpha: real
+ margin_l: real
+ margin_r: real
+ margin_u: real
+ margin_d: real
+ needs_auto_margins: bool
+ side_by_side: bool
+
+UTILtype
+ name: string
+ options: []
+ option_names: [string]
+ description: string
+ on: 
+
+*/
