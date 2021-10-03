@@ -713,7 +713,8 @@ if (app_sel)
    draw_sprite_ext(sprite_get("_pho_app_icons"), 0, app_x, app_y, 2, 2, 0, c_white, 1);
 
 draw_sprite_ext(sprite_get("_pho_app_icons"), i, app_x, app_y, 2, 2, 0, c_white, 1);
-textDraw(app_x + 10, app_y + 13, "fName", app_sel ? c_white : phone.apps[i].color, 10000, 200, fa_left, 1, true, 1, phone.apps[i].name, false);
+textDraw(app_x + 10, app_y + 13, "fName", (app_sel ? c_white : phone.apps[i].color), 
+         10000, 200, fa_left, 1, true, 1, phone.apps[i].name, false);
 
 
 //=====================================================================
@@ -803,13 +804,15 @@ draw_rectangle_color(x1, y1, x1 + width - 1, y1 + height - 1, color, color, colo
 
 var phone_active = phone.state > 0;
 
-if phone.big_screen_pos_offset < 1{
+if (phone.big_screen_pos_offset < 1)
+{
 	var draw_w = view_get_wview();
 	var draw_h = view_get_hview();
 	var draw_x = view_get_xview() - draw_w * phone.big_screen_pos_offset;
 	var draw_y = view_get_yview();
 	
-	if in_hud{
+	if (in_hud)
+    {
 		draw_x -= view_get_xview();
 		draw_y -= view_get_yview();
 	}
@@ -819,32 +822,45 @@ if phone.big_screen_pos_offset < 1{
 	var margin_t = 32;
 	var margin_b = 20;
 	
-	if phone.utils_cur[phone.UTIL_OPAQUE] == 0 || phone.utils_cur[phone.UTIL_OPAQUE] == 2 && !phone_active draw_set_alpha(0.75);
+	if (phone.utils_cur[phone.UTIL_OPAQUE] == 0)
+    || (phone.utils_cur[phone.UTIL_OPAQUE] == 2 && !phone_active)
+    { draw_set_alpha(0.75); }
 	rectDraw(draw_x, draw_y, draw_w, draw_h, c_black);
 	draw_set_alpha(1);
 	
-	draw_x -= round(118 * (phone.y / phone.lowered_y));
+    //offset applied depending on phone position (moves screen text to leave space for phone)
+    var xpos_offset = round(118 * (phone.y / phone.lowered_y));
+
+	draw_x -= xpos_offset;
 	draw_y -= phone.cursor_change_timer;
 	
-	if array_length(phone.apps[phone.app].array) > 0{
+    //Text indicator above phone for toggle of options or page scrolls
+    if (array_length(phone.apps[phone.app].array) > 0)
+    {
 		var item = phone.apps[phone.app].array[phone.cursor];
-		
-		if "page_starts" in item && array_length(item.page_starts) > 1{
-			textDraw(draw_x + 140 - round(118 * (phone.y / phone.lowered_y)), draw_y + 201 - phone.extra_top_size, "fName", c_white, 1000, 1000, fa_center, 1, 0, 1, "Page " + string(phone.page + 1), 0);
-			textDraw(draw_x + 140 - round(118 * (phone.y / phone.lowered_y)), draw_y + 222 - phone.extra_top_size, "fName", c_white, 1000, 1000, fa_center, 1, 0, 1, "ATTACK: " + (phone.page == array_length(item.page_starts) - 1 ? "First" : "Next"), 1);
+
+		if ("page_starts" in item) && (array_length(item.page_starts) > 1)
+        {
+			textDraw(draw_x + 140 - xpos_offset, draw_y + 201 - phone.extra_top_size, 
+                     "fName", c_white, 1000, 1000, fa_center, 1, 0, 1, 
+                     "Page " + string(phone.page + 1), false);
+			textDraw(draw_x + 140 - xpos_offset, draw_y + 222 - phone.extra_top_size, 
+                     "fName", c_white, 1000, 1000, fa_center, 1, 0, 1, 
+                     "ATTACK: " + (phone.page == array_length(item.page_starts) - 1 ? "First" : "Next"), true);
 		}
-		
-		else if "options" in item{
-			textDraw(draw_x + 140 - round(118 * (phone.y / phone.lowered_y)), draw_y + 222 - phone.extra_top_size, "fName", c_white, 1000, 1000, fa_center, 1, 0, 1, "ATTACK: " + (array_length(item.options) > 1 ? (array_length(item.options) > 2 ? "Next Option" : "Toggle") : "Activate"), 1);
+		else if ("options" in item)
+        {
+			textDraw(draw_x + 140 - xpos_offset, draw_y + 222 - phone.extra_top_size, 
+                     "fName", c_white, 1000, 1000, fa_center, 1, 0, 1, 
+                     "ATTACK: " + (array_length(item.options) > 1 ? (array_length(item.options) > 2 ? "Next Option" : "Toggle") : "Activate"), true);
 		}
 	}
 	
 	var app_color = phone.apps[phone.app].color;
 	
 	// below: drawing the contents of the screen
-	
-	if phone.app == phone.APP_TIPS || phone.app == phone.APP_PATCHES{
-	
+	if (phone.app == phone.APP_TIPS || phone.app == phone.APP_PATCHES)
+    {
 		draw_y += ease_sineIn(0, 400, phone.page_change_timer, phone.page_change_timer_max);
 		
 		var text_x = draw_x + margin_l;
@@ -932,8 +948,8 @@ if phone.big_screen_pos_offset < 1{
 			}
 		}
 	}
-	
-	else if phone.app == phone.APP_DATA{
+	else if (phone.app == phone.APP_DATA)
+    {
 		
 		var text_x = draw_x + margin_l;
 		var text_y = draw_y + margin_t;
@@ -1181,8 +1197,8 @@ array_push(utils, {
 #define CORE_update
 
 // one-time stuff
-
-if phone_practice && !phone.frame_data_loaded{
+if (phone_practice && !phone.frame_data_loaded)
+{
 	loadFrameData();
 	phone.frame_data_loaded = true;
 }

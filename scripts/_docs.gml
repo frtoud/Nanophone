@@ -367,6 +367,13 @@ a chance that their indexes overlap. To resolve this, see user_event14.gml.
 */
 
 /*
+KEY:
+ + Changes planned
+ Feature
+ - Dependencies of feature
+  Subfeature
+
+
 USER FEATURES
  Tips
 
@@ -414,6 +421,16 @@ VISUALS
  - Mask utilities
  - TextDraw
  - RectDraw
+
+ BIG SCREEN
+ - phone.state
+ - phone.big_screen_pos_offset
+ - phone.utils_cur
+ - phone.cursor_change_timer
+ - phone.y
+ - phone.lowered_y
+  + Try removing direct dependency to "y"
+ - phone.apps
 
 CSS NAMES
  - use_alt_names
