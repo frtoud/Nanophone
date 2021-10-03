@@ -96,7 +96,7 @@ phone_lagging = false;
 phone_online = detect_online(); //TRUE if in an online match
 
 // phone info
-phone_fast = 0;
+phone_fast = 0; //Fast graphics setting shortcut
 phone_char_ided = false; // lightweight only
 phone_cheats = [];
 phone_cheats_updated = []; // "just got clicked"; manually reset to 0
@@ -112,8 +112,8 @@ phone = {
 	
 	// dev-end config
 	uses_shader: 0,
-	supports_fast_graphics: false,
-	dont_fast: false,
+	supports_fast_graphics: false, // Set to true to activate fast graphics checks
+	dont_fast: false, //set to true to prevent low fps checks
 	include_stats: true,
 	stats_notes: "-",
 	include_custom: false,
@@ -1203,33 +1203,42 @@ if (phone_practice && !phone.frame_data_loaded)
 	phone.frame_data_loaded = true;
 }
 
-if !phone.lightweight
+// "Dev Features"
+if (!phone.lightweight)
 {
-	if !phone_char_ided{
-		with oPlayer if self != other{
-			if "muno_char_id" not in self muno_char_id = noone;
-			if "muno_char_name" not in self muno_char_name = get_char_info(player, INFO_STR_NAME);
-			if "muno_char_icon" not in self muno_char_icon = get_char_info(player, INFO_ICON);
-			if (muno_char_id == other.muno_char_id && muno_char_id != noone) || "url" in self && url == other.url{
+    //Tags all other characters in this match with three shortcuts
+	if (!phone_char_ided)
+    {
+		with (oPlayer) if (self != other)
+        {
+			if ("muno_char_id" not in self) muno_char_id = noone;
+			if ("muno_char_name" not in self) muno_char_name = get_char_info(player, INFO_STR_NAME);
+			if ("muno_char_icon" not in self) muno_char_icon = get_char_info(player, INFO_ICON);
+			if (muno_char_id == other.muno_char_id && muno_char_id != noone) //redundant?
+            || ("url" in self && url == other.url)
+            {
 				other.phone_ditto = true;
 				phone_ditto = true;
 			}
 		}
 		phone_char_ided = true;
 	}
-	
-	// general update utils - attacks
-			
-	if phone_arrow_cooldown > 0 phone_arrow_cooldown--;
-	if phone_invis_cooldown > 0 phone_invis_cooldown--;
-	
+
+	// general update utils - cooldown counting down
+	if (phone_arrow_cooldown > 0) phone_arrow_cooldown--;
+	if (phone_invis_cooldown > 0) phone_invis_cooldown--;
+
+    // all states that can reset a "once per airtime" move cooldown
 	phone_landing = (!free || state == PS_WALL_JUMP || state_cat == SC_HITSTUN || state == PS_RESPAWN);
-	
+
+    // Track attacking state
 	if (state == PS_ATTACK_AIR || state == PS_ATTACK_GROUND)
     {
 		phone_attacking = true;
-		phone_window_end = floor(get_window_value(attack, window, AG_WINDOW_LENGTH) * ((get_window_value(attack, window, AG_WINDOW_HAS_WHIFFLAG) && !has_hit) ? 1.5 : 1));
+		phone_window_end = floor(get_window_value(attack, window, AG_WINDOW_LENGTH)
+                             * ((get_window_value(attack, window, AG_WINDOW_HAS_WHIFFLAG) && !has_hit) ? 1.5 : 1));
 	}
+    // Interrupt attack sounds
 	else
     {
 		if (phone_attacking)
@@ -1238,25 +1247,24 @@ if !phone.lightweight
 			if !array_equals(phone_stopped_sounds, [])
             {
 				for (var ii = 0; ii < array_length(phone_stopped_sounds); ii++)
-                {
-					sound_stop(phone_stopped_sounds[ii]);
-				}
+                { sound_stop(phone_stopped_sounds[ii]); }
 				phone_stopped_sounds = [];
 			}
 		}
 		phone_attacking = false;
 	}
-	
-	if phone_attacking
+
+	if (phone_attacking)
     {
         //special invulnerability 
-		if phone_using_invul && !phone_invul_override && array_find_index(muno_invul_checked, attack) != -1
+		if (phone_using_invul && !phone_invul_override) 
+        && (array_find_index(muno_invul_checked, attack) != -1)
         {
 			super_armor = false;
 			invincible = false;
 			soft_armor = 0;
-			
-			switch(get_window_value(attack, window, AG_MUNO_WINDOW_INVUL))
+
+			switch (get_window_value(attack, window, AG_MUNO_WINDOW_INVUL))
             {
 				case -1:
 					invincible = true;
@@ -1271,14 +1279,14 @@ if !phone.lightweight
 					break;
 			}
 		}
-		
+
 		phone_invul_override = 0;
-		
-		if get_attack_value(attack, AG_MUNO_ATTACK_COOLDOWN) != 0{
-			
+
+		if (get_attack_value(attack, AG_MUNO_ATTACK_COOLDOWN) != 0)
+        {
 			var set_amt = abs(get_attack_value(attack, AG_MUNO_ATTACK_COOLDOWN));
-			
-			switch (get_window_value(attack, window, AG_MUNO_WINDOW_CD_SPECIAL)){
+			switch (get_window_value(attack, window, AG_MUNO_WINDOW_CD_SPECIAL))
+            {
 				case 1:
 					set_amt = -1;
 					break;
@@ -1306,19 +1314,24 @@ if !phone.lightweight
 			}
 		}
 	}
-	
-	if phone_using_landing_cd == noone{
+
+	if (phone_using_landing_cd == noone)
+    {
 		phone_using_landing_cd = 0;
 		phone_using_invul = 0;
 		muno_cooldown_checked = [];
 		muno_invul_checked = [];
-		for (var checked_move = 0; checked_move < 50; checked_move++){
-			if (get_attack_value(checked_move, AG_MUNO_ATTACK_COOLDOWN) < 0){
+		for (var checked_move = 0; checked_move < 50; checked_move++)
+        {
+			if (get_attack_value(checked_move, AG_MUNO_ATTACK_COOLDOWN) < 0)
+            {
 				phone_using_landing_cd = 1;
 				array_push(muno_cooldown_checked, checked_move);
 			}
-			for (var checked_window = 1; get_window_value(checked_move, checked_window, AG_WINDOW_LENGTH) > 0; checked_window++){
-				if (get_window_value(checked_move, checked_window, AG_MUNO_WINDOW_INVUL) != 0){
+			for (var checked_window = 1; get_window_value(checked_move, checked_window, AG_WINDOW_LENGTH) > 0; checked_window++)
+            {
+				if (get_window_value(checked_move, checked_window, AG_MUNO_WINDOW_INVUL) != 0)
+                {
 					phone_using_invul = 1;
 					array_push(muno_invul_checked, checked_move);
 				}
@@ -1342,25 +1355,26 @@ if !phone.lightweight
 		}
 	}
 	
-	// general update utils - misc
+	// Visible while respawning
+	if (phone_practice && state == PS_RESPAWN) visible = true;
 
-	if phone_practice && state == PS_RESPAWN{
-		visible = true;
-	}
-	
+    // Fast Graphics
 	if (phone.supports_fast_graphics)
     {
 		phone_fast = phone.utils[phone.UTIL_FAST].on;
-	
-		if !phone_fast && ((!phone_online && fps_real < 60) || (phone_online && keyboard_key == 112)) && !phone.state && !phone.dont_fast && state != PS_SPAWN && (state != PS_IDLE || state_timer > 5){
+
+		if !phone_fast && ((!phone_online && fps_real < 60) 
+        || (phone_online && keyboard_key == 112)) && !phone.state && !phone.dont_fast 
+        && state != PS_SPAWN && (state != PS_IDLE || state_timer > 5)
+        {
 			if (phone_lagging < 1) phone_lagging += 0.2;
-			else{
-				if (phone_online && keyboard_key == 48){
-					print_debug("FAST GRAPHICS ENABLED - F1 KEY PRESSED");
-				}
-				else{
-					print_debug("FAST GRAPHICS ENABLED - FPS REACHED " + string(fps_real));
-				}
+			else
+            {
+				if (phone_online && keyboard_key == 48)
+                { print_debug("FAST GRAPHICS ENABLED - F1 KEY PRESSED"); }
+				else
+                { print_debug("FAST GRAPHICS ENABLED - FPS REACHED " + string(fps_real)); }
+
 				phone.utils[phone.UTIL_FAST].on = 1;
 				phone.utils_cur[phone.UTIL_FAST] = 1;
 				phone.utils_cur_updated[phone.UTIL_FAST] = 1;
@@ -1386,6 +1400,8 @@ if !phone.lightweight
 //Phone utilities
 if (phone_practice)
 {
+    //=========================================================================
+    //Damage Freezing
     if (phone.utils_cur_updated[phone.UTIL_DMG_FREEZE])
     {
         phone.utils_cur_updated[phone.UTIL_DMG_FREEZE] = 0;
@@ -1394,6 +1410,8 @@ if (phone_practice)
     if (phone.utils_cur[phone.UTIL_DMG_FREEZE])
     { set_player_damage(player, phone_frozen_damage); }
 
+    //=========================================================================
+    //Stateloading
 	if (phone.utils_cur_updated[phone.UTIL_STATE_SAVE])
     {
 		phone.utils_cur_updated[phone.UTIL_STATE_SAVE] = 0;
@@ -1412,7 +1430,6 @@ if (phone_practice)
 		phone.utils_cur_updated[phone.UTIL_STATE_LOAD] = 0;
 
 		var found = 0;
-
 		with (oPlayer)
         {
 			if ("phone_save_state_x" in self)
@@ -1431,21 +1448,30 @@ if (phone_practice)
 		}
 	}
 
+    //=========================================================================
+    //CPU Behavior
 	if (phone.utils_cur[phone.UTIL_CPU])
     {
 		with (oPlayer)
         {
+            //Burnless Zetterburn
 			if (burned && burnt_id.url == CH_ZETTERBURN && get_player_hud_color(burnt_id.player) == c_gray) burned = 0;
 			if (get_player_hud_color(player) == c_gray)
             {
+                //Pillarless Kragg
 				if (url == CH_KRAGG) can_up_b = 0;
+                //Cloneless Forsburn
 				if (url == CH_FORSBURN) move_cooldown[AT_FSPECIAL] = 2;
-				if (url != CH_MAYPUL) marked = false;
-				if (url != CH_RANNO) poison = 0;
-				if (url == CH_SHOVEL_KNIGHT)
+				//Markless Maypul
+                if (url != CH_MAYPUL) marked = false;
+				//Poisonless Ranno
+                if (url != CH_RANNO) poison = 0;
+				//Gemless ShovelKnight (and no hitboxes on recovery)
+                if (url == CH_SHOVEL_KNIGHT)
                 {
 					gems = 0;
-					if (state == PS_ATTACK_AIR && window == 1 && window_timer == 1){
+					if (state == PS_ATTACK_AIR && window == 1 && window_timer == 1)
+                    {
 						set_num_hitboxes(AT_USPECIAL, 0);
 						set_num_hitboxes(AT_FSPECIAL, 0);
 					}
@@ -1454,6 +1480,8 @@ if (phone_practice)
 		}
 	}
 
+    //=========================================================================
+    //Infinite Parry
 	if (phone.utils_cur[phone.UTIL_PARRY])
     {
 		with (oPlayer) if (self != other) 

@@ -387,7 +387,7 @@ USER FEATURES
   + Add Rune control
 
 
- Utilities
+ UTILITIES
   - phone.utils_cur
   - phone.utils_cur_updated
   Low FPS Warning
@@ -445,20 +445,29 @@ CODE FEATURES
    - muno_char_name
    - muno_char_icon
    - phone_ditto
-  - phone_landing
-  - phone_attacking
-  - phone_window_end
+  ATTACK MISC
+   - phone_landing
+   - phone_attacking
+   - phone_window_end
+   SOUNDSTOP
+    - ATTACK MISC
+    - phone_stopped_sounds
+  RESPAWN VIS
+  FAST GRAPHICS
+   - phone.supports_fast_graphics
+   - phone.dont_fast
+   - phone.utils
+   - phone.utils_cur
+   - phone.utils_cur_updated
+   - phone_fast
+   - phone_online
+   - phone_lagging
+  DUST QUERY
+   - phone_dust_query
+   - spawn_base_dust()
 
  OFFSCREEN INDICATORS
   - phone_offscreen
-
- DUST QUERY
-  - phone_dust_query
-  - spawn_base_dust()
-
- SOUND STOP
-  - phone_attacking
-  - phone_stopped_sounds
 
 DEPENDENCIES
 
