@@ -12,19 +12,16 @@ switch(muno_event_type){
 	case 2: // set attack
 		CORE_set_attack();
 		break;
-	case 3: // pre draw
-		if phone.state{
-			break;
-		}
-		CORE_big_screen(0);
+	case 3: // article-depth draw
+		if (phone.state > 0) break;
+		CORE_big_screen(false);
 		break;
 	case 4: // post draw
 		CORE_post_draw();
 		break;
 	case 5: // draw hud
-		if phone.state{
-			CORE_big_screen(1);
-		}
+		if (phone.state > 0) 
+            CORE_big_screen(true);
 		CORE_draw_hud();
 		break;
 	case 6: // css draw
@@ -818,7 +815,7 @@ if (phone.big_screen_pos_offset < 1)
 	var draw_x = view_get_xview() - draw_w * phone.big_screen_pos_offset;
 	var draw_y = view_get_yview();
 	
-	if (in_hud)
+	if (in_hud) //called from draw_hud
     {
 		draw_x -= view_get_xview();
 		draw_y -= view_get_yview();
@@ -829,6 +826,7 @@ if (phone.big_screen_pos_offset < 1)
 	var margin_t = 32;
 	var margin_b = 20;
 	
+    //Background
 	if (phone.utils_cur[phone.UTIL_OPAQUE] == 0)
     || (phone.utils_cur[phone.UTIL_OPAQUE] == 2 && !phone_active)
     { draw_set_alpha(0.75); }
@@ -957,22 +955,20 @@ if (phone.big_screen_pos_offset < 1)
 	}
 	else if (phone.app == phone.APP_DATA)
     {
-		
 		var text_x = draw_x + margin_l;
 		var text_y = draw_y + margin_t;
-				
+
 		var this_w = draw_w - margin_l - margin_r;
 		var this_x = text_x + this_w / 2;
-		
-		textDraw(this_x, text_y, "fName", app_color, 18, this_w, fa_center, 1, 0, 1, "- " + item.name + " -", true);
-		
+
+        //Title
+		textDraw(this_x, text_y, "fName", app_color, 18, this_w, fa_center, 1, false, 1, "- " + item.name + " -", true);
 		text_y += phone.last_text_size.height + 10;
 		
-		switch(item.type){
+		switch(item.type)
+        {
 			case 1: // stats
-				
 				var stats_table = [
-					
 					// grounded
 					"Walk Speed", walk_speed,
 					"Walk Accel", walk_accel,
@@ -982,7 +978,7 @@ if (phone.big_screen_pos_offset < 1)
 					"Ground Friction", ground_friction,
 					"Waveland Adj", wave_land_adj,
 					"Waveland Friction", wave_friction,
-					
+
 					// aerial
 					"Max Air Speed", air_max_speed,
 					"Air Accel", air_accel,
@@ -992,7 +988,7 @@ if (phone.big_screen_pos_offset < 1)
 					"Fast Fall Speed", fast_fall,
 					"Gravity", gravity_speed,
 					"Hitstun Gravity", hitstun_grav,
-					
+
 					// jumps
 					"Full Hop", jump_speed,
 					"Short Hop", short_hop_speed,
@@ -1002,7 +998,7 @@ if (phone.big_screen_pos_offset < 1)
 					"Walljump VSP", walljump_vsp,
 					"Max Jump Speed", max_jump_hsp,
 					"DJump Change", jump_change,
-					
+
 					// misc
 					"Knockback Adj", knockback_adj,
 					"Jumpsquat Time", jump_start_time,
@@ -1011,27 +1007,33 @@ if (phone.big_screen_pos_offset < 1)
 					"Land Time", land_time,
 					"Notes", phone.stats_notes,
 					]
-				
+
 				var orig_y = text_y;
-				
-				for (var i = 0; i < array_length(stats_table); i += 2){
+
+                //Iterate items by Name/Value pairs and print to screen
+				for (var i = 0; i < array_length(stats_table); i += 2)
+                {
 					textDraw(text_x, text_y, "fName", app_color, 18, 160, fa_left, 1, 0, 1, stats_table[i], true);
 					text_y += phone.last_text_size.height;
 					textDraw(text_x + 16, text_y, "fName", c_white, 18, 100, fa_left, 1, 0, 1, decimalToString(stats_table[i+1]), true);
 					text_y += phone.last_text_size.height;
 					
-					if text_y > draw_y + draw_h - margin_b * 8{
+					if (text_y) > (draw_y + draw_h - margin_b * 8) //8 items per column
+                    {
 						text_y = orig_y;
 						text_x += 160;
 					}
 				}
 				break;
 			case 2: // a move
-				textDraw(draw_x + view_get_wview() - 9 + round(118 * 3 * (phone.y / phone.lowered_y)), draw_y + 32, "fName", c_white, 1000, 1000, fa_right, 1, 0, 1, "JUMP: Refresh", 1);
+                //Jump-refresh hint, position adjusted to exit top-right of screen when phone lowered
+				textDraw(draw_x + view_get_wview() - 9 + round(118 * 3 * (phone.y / phone.lowered_y)), 
+                         draw_y + 32, "fName", c_white, 1000, 1000, fa_right, 1, 0, 1, "JUMP: Refresh", 1);
 				
 				var orig_x = text_x;
 				var orig_y = text_y;
 				
+                //Top: Attack length
 				textDraw(text_x, text_y, "fName", app_color, 18, 160, fa_left, 1, 0, 1, "Length (Whiff):", true);
 				text_x += phone.last_text_size.width + 8;
 				textDraw(text_x, text_y, "fName", c_white, 18, 100, fa_left, 1, 0, 1, item.length, false);
@@ -1046,43 +1048,39 @@ if (phone.big_screen_pos_offset < 1)
 				
 				text_x = orig_x;
 				text_y += phone.last_text_size.height;
-				
-				if item.misc != "-"{
+
+                //Custom notes
+				if (item.misc != "-")
+                {
 					textDraw(text_x, text_y, "fName", app_color, 18, 160, fa_left, 1, 0, 1, "Notes:", true);
 					text_x += phone.last_text_size.width + 8;
 					textDraw(text_x, text_y, "fName", c_white, 18, draw_w - margin_l - margin_r - 64, fa_left, 1, 0, 1, item.misc, true);
 					text_y += phone.last_text_size.height;
 					text_x = orig_x;
 				}
-				
-				if array_length(item.hitboxes){
-					text_y += 10;
+
+                //Hitbox listing
+				if (array_length(item.hitboxes) > 0)
+                {
 					var add_x = 64;
-					var stats_table = [
-						"Active",
-						"DMG",
-						"BKB",
-						"KBG",
-						"Angle",
-						"Pri.",
-						"BHP",
-						"HPG",
-						];
-					
+
+					text_y += 10;
 					text_x += add_x * 2;
-					
-					for (var i = 0; i < array_length(stats_table); i++){
+
+                    //Stats header row
+					var stats_table = [ "Active", "DMG", "BKB", "KBG", "Angle", "Pri.", "BHP", "HPG",];
+					for (var i = 0; i < array_length(stats_table); i++)
+                    {
 						textDraw(text_x, text_y, "fName", app_color, 18, 24, fa_left, 1, 0, 1, stats_table[i], true);
 						text_x += add_x;
 					}
-					
 					text_y += phone.last_text_size.height + 10;
-					
-					var reached_end = false;
-	
+
 					text_y += ease_sineIn(0, 240, phone.page_change_timer, phone.page_change_timer_max);
 					
-					for (var i = item.page_starts[phone.page]; i < array_length(item.hitboxes) && !reached_end; i++){
+					var reached_end = false; //out of space onscreen (stops loop)
+					for (var i = item.page_starts[phone.page]; i < array_length(item.hitboxes) && !reached_end; i++)
+                    {
 						text_x = orig_x;
 						var hb = item.hitboxes[i];
 						stats_table = [
@@ -1095,39 +1093,46 @@ if (phone.big_screen_pos_offset < 1)
 							hb.base_hitpause,
 							hb.hitpause_scale,
 							];
+                        // Number + Name of hitbox
 						textDraw(text_x, text_y, "fName", app_color, 18, 120, fa_left, 1, 0, 1, item.hitboxes[i].name, false);
 						text_x += add_x * 2;
-					
-						for (var j = 0; j < array_length(stats_table); j++){
-							textDraw(text_x, text_y, "fName", hb.parent_hbox && hb.parent_hbox != j && j > 0 ? c_gray : c_white, 18, 24, fa_left, 1, 0, 1, stats_table[j], true);
+
+                        //listing stats
+						for (var j = 0; j < array_length(stats_table); j++)
+                        {
+                            var stat_color = (hb.parent_hbox && hb.parent_hbox != i && j > 0) ? c_gray : c_white;
+							textDraw(text_x, text_y, "fName", stat_color, 18, 24, fa_left, 1, 0, 1, stats_table[j], true);
 							text_x += add_x;
-						}
-						
+                        }
 						text_y += phone.last_text_size.height;
-						
-						if hb.misc != "-"{
+
+                        //misc hitbox information
+                        if (hb.misc != "-")
+                        {
 							text_x = orig_x + add_x * 2;
 							textDraw(text_x, text_y, "fName", c_gray, 18, draw_w - margin_l - margin_r - 128, fa_left, 1, 0, 1, hb.misc, true);
 							text_y += phone.last_text_size.height;
 						}
-						
 						text_y += 10;
 						
-						if text_y - ease_sineIn(0, 240, phone.page_change_timer, phone.page_change_timer_max) > draw_y + draw_h - margin_b - 64{
+                        //Ran out of space: mark this item as a new page
+						if (text_y - ease_sineIn(0, 240, phone.page_change_timer, phone.page_change_timer_max)) > (draw_y + draw_h - margin_b - 64)
+                        {
 							reached_end = true;
-							if !array_find_index(item.page_starts, i){
-								array_push(item.page_starts, i);
-							}
+							if !array_find_index(item.page_starts, i)
+                            { array_push(item.page_starts, i); }
 						}
 					}
 				}
 				break;
 			case 3: // custom
 				var orig_y = text_y;
-				
-				for (var i = 0; i < array_length(phone.custom_fd_content); i++){
+
+				for (var i = 0; i < array_length(phone.custom_fd_content); i++)
+                {
 					var cur = phone.custom_fd_content[i];
-					switch(cur.type){
+					switch(cur.type)
+                    {
 						case 0: // header
 							textDraw(text_x, text_y, "fName", app_color, 18, 160, fa_left, 1, 0, 1, cur.content, true);
 							text_y += phone.last_text_size.height;
@@ -1135,7 +1140,8 @@ if (phone.big_screen_pos_offset < 1)
 						case 1: // body
 							textDraw(text_x + 16, text_y, "fName", c_white, 18, 100, fa_left, 1, 0, 1, cur.content, true);
 							text_y += phone.last_text_size.height;
-							if text_y > draw_y + draw_h - margin_b * 8{
+							if text_y > (draw_y + draw_h - margin_b * 8)
+                            {
 								text_y = orig_y;
 								text_x += 160;
 							}
@@ -1146,7 +1152,8 @@ if (phone.big_screen_pos_offset < 1)
 		}
 	}
 	
-	else if phone.app == phone.APP_CHEATS || phone.app == phone.APP_UTILS{
+	else if (phone.app == phone.APP_CHEATS || phone.app == phone.APP_UTILS)
+    {
 		
 		var text_x = draw_x + margin_l;
 		var text_y = draw_y + margin_t;

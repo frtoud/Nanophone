@@ -382,6 +382,23 @@ USER FEATURES
 
  Frame Data
   Reloading frame data
+  Stats page
+   - DATAtype::1
+   - phone.stats_notes
+   - phone.apps
+   - decimalToString()
+   - phone.last_text_size
+   - phone.include_stats
+   - phone.stats_notes
+  Move page
+   - DATAtype::2
+   - 
+  Custom page
+   - DATAtype::3
+   - phone.include_custom
+   - phone.custom_name
+   - phone.custom_fd_content
+
 
  Cheats page
   + Rename to "Extras"
@@ -432,6 +449,12 @@ VISUALS
  - phone.lowered_y
   + Try removing direct dependency to "y"
  - phone.apps
+  PAGE SYSTEM
+  - phone.page
+  - phone.page_change_timer
+  - phone.page_change_timer_max
+  // sets item.page_starts on appropriate app items when running out of drawspace
+  
 
 CSS NAMES
  - use_alt_names
@@ -479,6 +502,7 @@ DEPENDENCIES
  initTip
  - phone.tips
  - phone.currently_edited_obj
+ decimalToString
 
 USER CONTROL VARIABLES
  use_alt_names
@@ -506,13 +530,13 @@ TIPtype
 
 TIPOBJtype
  type: int -> [0, 1]
-TIPOBJtype::0
+TIPOBJtype::0 -> Text
  text: string
  align: aligntype
  color: colortype
  indent: int
  side_by_side: bool
-TIPOBJtype::1
+TIPOBJtype::1 -> Image
  sprite: spritetype
  frame: frametype
  align: aligntype
@@ -534,4 +558,36 @@ UTILtype
  description: string
  on: 
 
+DATAtype
+ type: int -> [1, 2, 3]
+ name: string
+DATAtype::1 -> Stats
+DATAtype::2 -> Moves
+ index:
+ length: string
+ ending_lag: string
+ landing_lag: string
+ hitboxes: [HBDATAtype]
+ page_starts: [int]
+ num_hitboxes: int
+ timeline: 
+ misc: string
+DATAtype::3 -> Custom
+
+HBDATAtype
+ name: string
+ active:
+ damage:
+ base_kb:
+ kb_scale:
+ angle:
+ priority:
+ base_hitpause:
+ hitpause_scale:
+ parent_hbox: int
+ misc: string
+
+CUSTOMFDtype
+ type: int [0, 1]
+ content: string
 */

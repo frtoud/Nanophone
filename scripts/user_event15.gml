@@ -519,7 +519,7 @@ phone.stats_notes = "-";
 
 // Whether or not to include a custom data page, which can hold any values you
 // want - useful for data that's specific to your character's mechanics.
-phone.include_custom = false;
+phone.include_custom = true;
 
 // The name of the custom page.
 phone.custom_name = "Example Custom Data"
@@ -531,6 +531,11 @@ initCFDHeader("Second value");
 initCFDBody("459");
 initCFDBody("epic");
 
+for (var ii = 0; ii < 17; ii++)
+{
+initCFDHeader("Does this bug you");
+initCFDBody("yes");
+}
 
 
 /*
