@@ -1551,7 +1551,7 @@ if (phone_practice)
     //CPU Behavior
 	if (phone.utils_cur[phone.UTIL_CPU])
     {
-		with (oPlayer)
+		with (oPlayer) if ("url" in self)
         {
             //Burnless Zetterburn
 			if (burned && burnt_id.url == CH_ZETTERBURN && get_player_hud_color(burnt_id.player) == c_gray) burned = 0;
@@ -1561,10 +1561,6 @@ if (phone_practice)
 				if (url == CH_KRAGG) can_up_b = 0;
                 //Cloneless Forsburn
 				if (url == CH_FORSBURN) move_cooldown[AT_FSPECIAL] = 2;
-				//Markless Maypul
-                if (url != CH_MAYPUL) marked = false;
-				//Poisonless Ranno
-                if (url != CH_RANNO) poison = 0;
 				//Gemless ShovelKnight (and no hitboxes on recovery)
                 if (url == CH_SHOVEL_KNIGHT)
                 {
@@ -1576,10 +1572,10 @@ if (phone_practice)
 					}
 				}
 			}
-				//Markless Maypul
-                if (url != CH_MAYPUL) marked = false;
-				//Poisonless Ranno
-                if (url != CH_RANNO) poison = 0;
+            //Markless Maypul
+            if (url != CH_MAYPUL) marked = false;
+            //Poisonless Ranno
+            if (url != CH_RANNO) poison = 0;
 		}
 	}
 
