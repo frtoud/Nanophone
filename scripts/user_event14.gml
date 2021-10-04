@@ -1125,7 +1125,7 @@ if (phone.big_screen_pos_offset < 1)
 					}
 				}
 				break;
-			case 3: // custom
+			case 3: // custom data page
 				var orig_y = text_y;
 
 				for (var i = 0; i < array_length(phone.custom_fd_content); i++)
@@ -1151,54 +1151,50 @@ if (phone.big_screen_pos_offset < 1)
 				break;
 		}
 	}
-	
 	else if (phone.app == phone.APP_CHEATS || phone.app == phone.APP_UTILS)
     {
-		
 		var text_x = draw_x + margin_l;
 		var text_y = draw_y + margin_t;
 		
 		var this_w = draw_w - margin_l - margin_r;
 		var this_x = round(text_x + this_w / 2);
 		
+        //Title and description
 		textDraw(this_x, text_y, "fName", app_color, 18, this_w, fa_center, 1, 0, 1, "- " + item.name + " -", true);
 		text_y += phone.last_text_size.height + 10;
 		textDraw(this_x, text_y, "fName", c_white, 18, this_w, fa_center, 1, 0, 1, item.description, true);
 		text_y += phone.last_text_size.height + 30;
 		
-		
+        //Underlined
 		rectDraw(text_x + 64, text_y - 19, this_w - 128, 2, app_color);
 		
-		if array_length(item.option_names) > 1{
-			for (var i = 0; i < array_length(item.option_names); i++){
+		if (array_length(item.option_names) > 1)
+        {
+            //List options
+			for (var i = 0; i < array_length(item.option_names); i++)
+            {
 				var to_draw = item.option_names[i];
-				if item.on == i to_draw = "> " + to_draw + " <";
-				textDraw(this_x, text_y, "fName", item.on == i ? c_white : c_gray, 18, this_w, fa_center, 1, 0, 1, to_draw, true);
+
+                //emphasis on current selection
+                var text_color = (item.on == i ? c_white : c_gray);
+				if (item.on == i) to_draw = "> " + to_draw + " <";
+
+				textDraw(this_x, text_y, "fName", text_color, 18, this_w, fa_center, 1, 0, 1, to_draw, true);
 				text_y += phone.last_text_size.height + 10;
 			}
 		}
-		else{
+		else
+        {
+            //Single option "trigger" utility
 			var to_draw = "> Click to Activate <";
 			textDraw(this_x, text_y, "fName", c_white, 18, this_w, fa_center, 1, 0, 1, to_draw, true);
 		}
 	}
-}
-	
-if phone.utils_cur[phone.UTIL_GREEN] && !phone_active rectDraw(0, 0, room_width, room_height, c_lime);
+} //End big screen
 
-
-
-/*
-array_push(utils, {
-	name: ch_name,
-	options: ch_opt,
-	option_names: ch_opt_name,
-	description: ch_desc,
-	on: 0
-});
-*/
-
-
+//Greenscreen utility
+if (!phone_active && phone.utils_cur[phone.UTIL_GREEN]) 
+    rectDraw(0, 0, room_width, room_height, c_lime);
 
 /*
 ╔═══════════════════════════════════════════════════════════════════════════╗

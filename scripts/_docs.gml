@@ -392,7 +392,9 @@ USER FEATURES
    - phone.stats_notes
   Move page
    - DATAtype::2
-   - 
+   - phone.last_text_size
+   - textDraw()
+   - PAGE SYSTEM
   Custom page
    - DATAtype::3
    - phone.include_custom
@@ -420,6 +422,7 @@ USER FEATURES
    - phone_save_state_spr_dir
    - phone_save_state_dmg
   Greenscreen
+   + more chromakey options
   Endless Parry
   Spam Attack
   CPU Behavior Change
@@ -509,8 +512,8 @@ USER CONTROL VARIABLES
  alt_ui_recolor
 
 NOTES
- - Need focus switch to big screen for Runes settings
-
+ + Need focus switch to big screen for Runes settings
+ + Greenscreen util inneficient: still renders the text behind it
  */
 
 /*
@@ -553,10 +556,11 @@ TIPOBJtype::1 -> Image
 
 UTILtype
  name: string
- options: []
- option_names: [string]
+ options: [] //list of states
+ option_names: [string] //names for states
  description: string
- on: 
+ on: int //current option[] index active
+//single-state options "triggered" instead of switched
 
 DATAtype
  type: int -> [1, 2, 3]
