@@ -246,6 +246,34 @@ in a Patch.
 
 #define CORE_patches
 
+initPatch("1.4", "03 October, 2021");
+initHeader("NAir - Adjustments, Aesthetics");
+initSection("Sped up the move's multi-hits.
+Moved the hitboxes downward.
+Adjusted sprite.");
+initHeader("Taunt - Additions");
+initSection("Added a secret taunt.");
+initHeader("MunoPhone Touch Firmware v4");
+initSection("CSS alt display with >16 alts now uses thinner rectangles instead of two pages.
+Adjusted the position of CSS alt names when playing online.
+Fixed a bug where the Freeze Own Damage Utility was dependent on the character supporting Fast Graphics.
+Fixed a bug where the frame data for parent hitboxes was formatted incorrectly.");
+
+initPatch("1.3", "30 September, 2021");
+initHeader("DStrong - Nerfs, Adjustments, Aesthetics");
+initSection("Reduced hitbox size and adjusted position.
+Hitbox lifetime 5 --> 3.
+Adjusted sprite.");
+initHeader("DAttack - Nerfs, Aesthetics");
+initSection("Endlag 10 --> 12.
+Adjusted sprite.");
+initHeader("MunoPhone Touch Firmware v3");
+initSection("Added the Spam Attack Utility.
+The options for Cheats / Utilities will now split into up to four columns for long lists, so the maximum is 40 items.
+The jump button now scrolls backwards through a Cheat / Utility's options.
+Made the Endless Parry Utility only work if the CPU action is set to Parry.
+Fixed the Ranno and Maypul functionality in the CPU Behavior Changes Utility.");
+
 initPatch("1.2", "22 September, 2021");
 initHeader("MunoPhone Touch Firmware v2");
 initSection("Added the Endless Parry Utility.");

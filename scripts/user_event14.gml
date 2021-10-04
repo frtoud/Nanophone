@@ -105,7 +105,7 @@ instance_create(x, y, "obj_article_solid");
 phone = {
 	
 	// version
-	firmware: 2,
+	firmware: 4,
 	
 	// dev-end config
 	uses_shader: 0,
@@ -180,6 +180,64 @@ sfx_pho_power_on = sound_get("_pho_acnh_chime1");
 
 initIndexes();
 
+
+phone.attack_names = [
+	"None",
+	"Jab",
+	"???",
+	"???",
+	"FTilt",
+	"DTilt",
+	"UTilt",
+	"FStrong",
+	"DStrong",
+	"UStrong",
+	"DAttack",
+	"FAir",
+	"BAir",
+	"DAir",
+	"UAir",
+	"NAir",
+	"FSpecial",
+	"DSpecial",
+	"USpecial",
+	"NSpecial",
+	"FStrong 2",
+	"DStrong 2",
+	"UStrong 2",
+	"USpecial Ground",
+	"USpecial 2",
+	"FSpecial 2",
+	"FThrow",
+	"UThrow",
+	"DThrow",
+	"NThrow",
+	"DSpecial 2",
+	"Extra 1",
+	"DSpecial Air",
+	"NSpecial 2",
+	"FSpecial Air",
+	"Taunt",
+	"Taunt 2",
+	"Extra 2",
+	"Extra 3",
+	"MunoPhone",
+	"???",
+	"NSpecial Air",
+	"???",
+	"???",
+	"???",
+	"???",
+	"???",
+	"???",
+	"???",
+	"???",
+	"???"
+];
+
+
+
+
 with (phone)
 {
 	phone = self; //redundancy to avoid ambiguity in function calls?
@@ -222,6 +280,37 @@ with (phone)
 	
 	Useful for testing the on-parry effects of a move without having to time it perfectly - try setting the CPU to Parry.");
 
+	var attack_list = [
+		0,
+		AT_JAB,
+		AT_FTILT,
+		AT_DTILT,
+		AT_UTILT,
+		AT_DATTACK,
+		AT_FSTRONG,
+		AT_USTRONG,
+		AT_DSTRONG,
+		AT_NAIR,
+		AT_FAIR,
+		AT_BAIR,
+		AT_UAIR,
+		AT_DAIR,
+		AT_NSPECIAL,
+		AT_FSPECIAL,
+		AT_USPECIAL,
+		AT_DSPECIAL,
+		AT_TAUNT,
+		];
+		
+	var attack_names = [];
+	
+	for (var i = 0; i < array_length(attack_list); i++){
+		attack_names[i] = phone.attack_names[attack_list[i]];
+	}
+	
+	UTIL_ATTACK		= pho_initUtil("Spam Attack", attack_list, attack_names, "Makes the CPU spam a certain attack. Set the CPU action to Crouch for ground moves, and Jump for air moves.
+	
+	(If the action is Jump, this Utility will also try to force the CPU to shorthop.)");
 	UTIL_CPU		= pho_initUtil("CPU Behavior Changes", [1, 0], ["On", "Off"], 
     "Makes changes to some base-game CPUs to make them better training dummies, removing annoying side effects when recovering.
 	
@@ -1487,12 +1576,16 @@ if (phone_practice)
 					}
 				}
 			}
+				//Markless Maypul
+                if (url != CH_MAYPUL) marked = false;
+				//Poisonless Ranno
+                if (url != CH_RANNO) poison = 0;
 		}
 	}
 
     //=========================================================================
     //Infinite Parry
-	if (phone.utils_cur[phone.UTIL_PARRY])
+	if (phone.utils_cur[phone.UTIL_PARRY] && get_training_cpu_action() == CPU_PARRY)
     {
 		with (oPlayer) if (self != other) 
         && (state == PS_PARRY && window == 1 && !hitpause && !invincible) 
@@ -1500,6 +1593,16 @@ if (phone_practice)
             window_timer = 1;
         }
 	}
+
+	if phone.utils_cur[phone.UTIL_ATTACK]{
+		var atk = phone.utils_cur[phone.UTIL_ATTACK];
+		with oPlayer if get_player_hud_color(player) == c_gray && (state == PS_FIRST_JUMP && vsp != 0 || state == PS_CROUCH){
+			if (state == PS_FIRST_JUMP){
+				vsp = -short_hop_speed;
+			}
+			set_attack(atk);
+		}
+    }
 }
 
 //=============================================================================
@@ -1738,12 +1841,14 @@ if "options" in arr[phone.cursor]{
 	var opts = array_length(arr[phone.cursor].options);
 	var utiling = phone.app == phone.APP_UTILS;
 	var cheating = phone.app == phone.APP_CHEATS;
-	if attack_pressed{
-		arr[phone.cursor].on++;
+	var cursor_change = (attack_pressed - jump_pressed);
+	if cursor_change != 0{
+		arr[phone.cursor].on += cursor_change;
 		if utiling phone.utils_cur_updated[phone.cursor] = 1;
 		if cheating phone_cheats_updated[phone.cursor] = 1;
 		phoneCursorChange();
 		clear_button_buffer(PC_ATTACK_PRESSED);
+		clear_button_buffer(PC_JUMP_PRESSED);
 		phonePageChange();
 		sound_play(sfx_pho_page, false, 0);
 	}
@@ -1819,59 +1924,6 @@ if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || attack == AT_PHONE{
 
 #define loadFrameData
 
-var move_names = [
-	"???",
-	"Jab",
-	"???",
-	"???",
-	"FTilt",
-	"DTilt",
-	"UTilt",
-	"FStrong",
-	"DStrong",
-	"UStrong",
-	"DAttack",
-	"FAir",
-	"BAir",
-	"DAir",
-	"UAir",
-	"NAir",
-	"FSpecial",
-	"DSpecial",
-	"USpecial",
-	"NSpecial",
-	"FStrong 2",
-	"DStrong 2",
-	"UStrong 2",
-	"USpecial Ground",
-	"USpecial 2",
-	"FSpecial 2",
-	"FThrow",
-	"UThrow",
-	"DThrow",
-	"NThrow",
-	"DSpecial 2",
-	"Extra 1",
-	"DSpecial Air",
-	"NSpecial 2",
-	"FSpecial Air",
-	"Taunt",
-	"Taunt 2",
-	"Extra 2",
-	"Extra 3",
-	"MunoPhone",
-	"???",
-	"NSpecial Air",
-	"???",
-	"???",
-	"???",
-	"???",
-	"???",
-	"???",
-	"???",
-	"???",
-	"???"
-];
 
 i = 0; // i = current spot in the registered move list
 
@@ -1881,7 +1933,7 @@ if phone.include_custom initCustom();
 for (j = 0; j < array_length_1d(phone.move_ordering); j++){ // j = index in array of ordered attack indexes
 	var current_attack_index = phone.move_ordering[j];
 	if (get_window_value(current_attack_index, 1, AG_WINDOW_LENGTH) || get_hitbox_value(current_attack_index, 1, HG_HITBOX_TYPE)) && !get_attack_value(current_attack_index, AG_MUNO_ATTACK_EXCLUDE){
-		initMove(current_attack_index, move_names[current_attack_index]);
+		initMove(current_attack_index, phone.attack_names[current_attack_index]);
 	}
 }
 
