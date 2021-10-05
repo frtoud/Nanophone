@@ -1602,12 +1602,15 @@ if (phone_practice)
         }
     }
 
-    if phone.utils_cur[phone.UTIL_ATTACK]{
+    //=========================================================================
+    //Force-attacks
+    if (phone.utils_cur[phone.UTIL_ATTACK] > 0)
+    {
         var atk = phone.utils_cur[phone.UTIL_ATTACK];
-        with oPlayer if get_player_hud_color(player) == c_gray && (state == PS_FIRST_JUMP && vsp != 0 || state == PS_CROUCH){
-            if (state == PS_FIRST_JUMP){
-                vsp = -short_hop_speed;
-            }
+        with (oPlayer) if (get_player_hud_color(player) == c_gray) 
+                       && (state == PS_FIRST_JUMP && vsp != 0 || state == PS_CROUCH)
+        {
+            if (state == PS_FIRST_JUMP) vsp = -short_hop_speed;
             set_attack(atk);
         }
     }
@@ -1626,32 +1629,32 @@ if (phone_practice) switch(phone.state)
         if (phone.app == phone.APP_HOME) phone.cursor = 1;
         if (phone.state_timer >= s_t_max)
         {
-            setPhoneState(2);
+            setPhoneState(2); //to opened state
             phone.has_opened_yet = true;
         }
         break;
     case 2: // opened
         phone.y = 0;
         
-        if phone.app == phone.APP_HOME{
+        if (phone.app == phone.APP_HOME)
+        {
             var sel = normalListLogic(true);
-            if sel != -1{
+            if (sel != -1)
+            {
                 setPhoneApp(sel);
                 sound_play(sfx_pho_open_app, false, 0);
                 phoneAppIconSlide();
                 phone.cursor = 0;
             }
         }
-        
         else if (phone.app == phone.APP_TIPS || phone.app == phone.APP_PATCHES)
         {
             var sel = normalListLogic(false);
         }
-        
-        else if phone.app == phone.APP_DATA
+        else if (phone.app == phone.APP_DATA)
         {
             var sel = normalListLogic(false);
-            if sel == -1 && jump_pressed
+            if (sel == -1 && jump_pressed)
             {
                 sound_play(sfx_pho_power_on, false, 0);
                 print("Frame Data reloaded!");
@@ -1661,38 +1664,43 @@ if (phone_practice) switch(phone.state)
                 clear_button_buffer(PC_JUMP_PRESSED);
             }
         }
-        
-        else if phone.app == phone.APP_CHEATS || phone.app == phone.APP_UTILS{
+        else if (phone.app == phone.APP_CHEATS || phone.app == phone.APP_UTILS)
+        {
             var sel = normalListLogic(false);
         }
-        
-        else if phone.app == phone.APP_POWER
+        else if (phone.app == phone.APP_POWER)
         {
-            if attack_pressed{
+            if (attack_pressed)
+            {
                 clear_button_buffer(PC_ATTACK_PRESSED);
-                setPhoneState(4);
+                setPhoneState(4); // to permanent closed state
                 sound_play(sfx_pho_power_off, false, 0);
             }
         }
-        
-        else{
+        else
+        {
+            //Unknown app; send to HOME
             setPhoneApp(0);
         }
         
-        if special_pressed{
-            if phone.app{
+        if (special_pressed) //"Back"
+        {
+            if (phone.app > 0)
+            {
                 phone.cursor = phone.app;
-                setPhoneApp(0);
+                setPhoneApp(0); //HOME
                 phoneAppIconSlide();
                 sound_play(sfx_pho_close_app, false, 0);
             }
-            else{
-                setPhoneState(3);
+            else
+            {
+                setPhoneState(3); //closing
                 sound_play(sfx_pho_close, false, 0);
             }
             clear_button_buffer(PC_SPECIAL_PRESSED);
         }
-        else if shield_pressed || taunt_pressed{
+        else if (shield_pressed || taunt_pressed)
+        {
             setPhoneState(3);
             sound_play(sfx_pho_close, false, 0);
             clear_button_buffer(PC_SHIELD_PRESSED);
@@ -1703,23 +1711,25 @@ if (phone_practice) switch(phone.state)
     case 3: // closing
         var s_t_max = 15;
         phone.y = ease_backIn(0, phone.lowered_y, phone.state_timer, s_t_max, 1);
-        if phone.state_timer >= s_t_max{
+        if (phone.state_timer >= s_t_max)
+        {
             setPhoneState(0);
         }
         break;
     case 4: // closing... forever!
         var s_t_max = 15;
         phone.y = ease_backIn(0, phone.lowered_y, phone.state_timer, s_t_max, 1);
-        if phone.state_timer >= s_t_max{
+        if (phone.state_timer >= s_t_max)
+        {
             setPhoneState(0);
-            phone_practice = 0;
+            phone_practice = 0; // no longer considered practice mode = feature turned off permanently
         }
         break;
 }
 
 if (phone_practice)
 {
-    //No big screen for Home & Power
+    //No big screen for Home & Power, or Apps that have nothing to display
     phoneBigScreen(phone.app == clamp(phone.app, phone.APP_TIPS, phone.APP_UTILS) 
                                     && array_length(phone.apps[phone.app].array));
 }
@@ -1781,6 +1791,7 @@ phone.click_bump_timer = phone.click_bump_timer_max;
 phone.page_change_timer = phone.page_change_timer_max;
 
 //=============================================================================
+// State/App setters
 #define setPhoneApp(n_app)
 {
     phone.app = n_app;
@@ -1793,46 +1804,49 @@ phone.page_change_timer = phone.page_change_timer_max;
     phone.state_timer = 0;
 }
 //=============================================================================
-
+// Returns current cursor selection index (or -1 if no selection can be made)
 #define normalListLogic(ignore_0th)
 
 var arr = phone.apps[phone.app].array;
 var len = array_length_1d(arr);
 
-if len == 0 return -1;
+if (len == 0) return -1; //No items on this app
 
-var pages_valid = 0;
+var pages_valid = false;
 
-if (!joy_pad_idle && "held_timer" in self) && array_length(arr) > 1{
-    held_timer++;
+//joystick: moving cursor around list
+if (!joy_pad_idle && "held_timer" in self) && (array_length(arr) > 1)
+{
+    held_timer++; //holding input causes quick scrolling
+    var held = (held_timer > 24) && (held_timer % 5 == 0);
     
-    var held = held_timer > 24 && held_timer mod 5 == 0;
-    
-    if (down_pressed || (down_down && held)){
+    if (down_pressed || (down_down && held))
+    {
         phone.cursor++;
         phone.page = 0;
         phoneCursorChange();
-        sound_play(phone.app ? sfx_pho_move : sfx_pho_move_home, false, 0);
+        sound_play((phone.app > 0) ? sfx_pho_move : sfx_pho_move_home, false, 0);
     }
-    
-    else if (up_pressed || (up_down && held)){
+    else if (up_pressed || (up_down && held))
+    {
         phone.cursor--;
         phone.page = 0;
         phoneCursorChange();
-        sound_play(phone.app ? sfx_pho_move : sfx_pho_move_home, false, 0);
-        if ignore_0th && phone.cursor == 0{
+        sound_play((phone.app > 0) ? sfx_pho_move : sfx_pho_move_home, false, 0);
+        if (ignore_0th && phone.cursor == 0)
+        {
             phone.cursor = len - 1;
         }
     }
     
     phone.cursor = (phone.cursor + len) % len;
 }
-else{
-    held_timer = 0;
-}
-    
-if "page_starts" in arr[phone.cursor] && array_length(arr[phone.cursor].page_starts) > 1{
-    pages_valid = 1;
+else { held_timer = 0; }
+
+//Attack: page changes
+if ("page_starts" in arr[phone.cursor] && array_length(arr[phone.cursor].page_starts) > 1)
+{
+    pages_valid = true;
     var pgs = array_length(arr[phone.cursor].page_starts);
     if attack_pressed{
         phone.page++;
@@ -1844,13 +1858,16 @@ if "page_starts" in arr[phone.cursor] && array_length(arr[phone.cursor].page_sta
     phone.page = (phone.page + pgs) % pgs;
 }
 
-if "options" in arr[phone.cursor]{
-    pages_valid = 1;
+//Attack: options toggle
+if ("options" in arr[phone.cursor])
+{
+    pages_valid = true;
     var opts = array_length(arr[phone.cursor].options);
     var utiling = phone.app == phone.APP_UTILS;
     var cheating = phone.app == phone.APP_CHEATS;
     var cursor_change = (attack_pressed - jump_pressed);
-    if cursor_change != 0{
+    if (cursor_change != 0)
+    {
         arr[phone.cursor].on += cursor_change;
         if utiling phone.utils_cur_updated[phone.cursor] = 1;
         if cheating phone_cheats_updated[phone.cursor] = 1;
@@ -1865,16 +1882,21 @@ if "options" in arr[phone.cursor]{
     if cheating phone_cheats[phone.cursor] = arr[phone.cursor].options[arr[phone.cursor].on];
 }
 
-if phone.app > 0{
+//Scrolling (except for HOME)
+if (phone.app > 0)
+{
     phone.target_scroll_dist = 0;
     var total_height = 0;
     var found_cursor = 0;
     
-    for (var i = 0; i < array_length(arr); i++){
+    for (var i = 0; i < array_length(arr); i++)
+    {
         textDraw(0, 0, "fName", c_white, 18, phone.screen_width - 8, fa_center, 1, 0, 0, arr[i].name, true);
         total_height += phone.last_text_size.height + 6;
-        if !found_cursor phone.target_scroll_dist += phone.last_text_size.height + 6;
-        if phone.cursor == i{
+        if (!found_cursor) 
+        { phone.target_scroll_dist += phone.last_text_size.height + 6; }
+        if (phone.cursor == i)
+        {
             found_cursor = true;
             phone.target_scroll_dist -= phone.last_text_size.height * 0.5;
         }
@@ -1884,22 +1906,27 @@ if phone.app > 0{
     
     phone.scroll_dist = lerp(phone.scroll_dist, phone.target_scroll_dist, 0.5);
 }
-else{
+else
+{
     phone.scroll_dist = 0;
     phone.target_scroll_dist = 0;
 }
 
-if ignore_0th && phone.cursor == 0{
+//prevent selection of 0th element if needed
+if (ignore_0th && phone.cursor == 0)
+{
     phone.cursor = 1;
 }
 
-if attack_pressed && !pages_valid{
+//return selected entry
+if (attack_pressed && !pages_valid)
+{
     clear_button_buffer(PC_ATTACK_PRESSED);
     return phone.cursor;
 }
+
+//being able to page-scroll prevents selection output
 return -1;
-
-
 
 /*
 ╔═══════════════════════════════════════════════════════════════════════════╗

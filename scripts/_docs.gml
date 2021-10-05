@@ -401,7 +401,6 @@ USER FEATURES
    - phone.custom_name
    - phone.custom_fd_content
 
-
  Cheats page
   + Rename to "Extras"
   + Add Rune control
@@ -458,6 +457,15 @@ VISUALS
   - phone.page_change_timer_max
   // sets item.page_starts on appropriate app items when running out of drawspace
   
+
+GENERAL INTERFACE
+ normalListLogic
+  - held_timer
+  - phone.apps[].array
+  - phone.cursor
+  - phone.scroll_dist
+  - phone.target_scroll_dist
+  - phone.screen_width
 
 CSS NAMES
  - use_alt_names
@@ -525,6 +533,9 @@ PHONE
  utils: UTILtype
  utils_cur: []
  utils_cur_updated: [bool]
+
+APPtype
+ array: []
 
 TIPtype
  name: string
