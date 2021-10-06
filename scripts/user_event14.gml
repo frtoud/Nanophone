@@ -1189,7 +1189,7 @@ if (phone.big_screen_pos_offset < 1)
                         //listing stats
                         for (var j = 0; j < array_length(stats_table); j++)
                         {
-                            var stat_color = (hb.parent_hbox && hb.parent_hbox != i && j > 0) ? c_gray : c_white;
+                            var stat_color = (hb.parent_hbox > 0 && j > 0) ? c_gray : c_white;
                             textDraw(text_x, text_y, "fName", stat_color, 18, 24, fa_left, 1, 0, 1, stats_table[j], true);
                             text_x += add_x;
                         }
@@ -1949,51 +1949,52 @@ if get_attack_value(attack, AG_MUNO_ATTACK_COOLDOWN) != 0 switch (get_attack_val
         break;
 }
 
-if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || attack == AT_PHONE{
+if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || (attack == AT_PHONE)
+{
     attack = AT_PHONE;
     with phone setPhoneState(1);
     sound_play(phone.has_opened_yet ? sfx_pho_open : sfx_pho_power_on, false, 0);
 }
 
 
-
+//========================================================================================================
+// Registers every move data into the Data app's array
 #define loadFrameData
-
 
 i = 0; // i = current spot in the registered move list
 
-if phone.include_stats initStats();
-if phone.include_custom initCustom();
+if (phone.include_stats) initStats();
+if (phone.include_custom) initCustom();
 
-for (j = 0; j < array_length_1d(phone.move_ordering); j++){ // j = index in array of ordered attack indexes
+for (j = 0; j < array_length_1d(phone.move_ordering); j++)  // j = index in array of ordered attack indexes
+{
     var current_attack_index = phone.move_ordering[j];
-    if (get_window_value(current_attack_index, 1, AG_WINDOW_LENGTH) || get_hitbox_value(current_attack_index, 1, HG_HITBOX_TYPE)) && !get_attack_value(current_attack_index, AG_MUNO_ATTACK_EXCLUDE){
+    if !get_attack_value(current_attack_index, AG_MUNO_ATTACK_EXCLUDE)
+    && (get_window_value(current_attack_index, 1, AG_WINDOW_LENGTH) 
+    ||  get_hitbox_value(current_attack_index, 1, HG_HITBOX_TYPE)) 
+    {
         initMove(current_attack_index, phone.attack_names[current_attack_index]);
     }
 }
 
-
-
+//=======================================================================================
+// reserves spots for special stat pages
 #define initStats
-
 array_push(phone.data, {
     name: "Stats",
     type: 1 // stats
 });
-
 #define initCustom
-
 array_push(phone.data, {
     name: phone.custom_name,
     type: 3 // custom
 });
-
-
-
+//=======================================================================================
+// 
 #define initMove(atk_index, default_move_name)
 
-var def = "-";
-var n = 0, hh = 0;
+var def = "-"; //default value, considered as string-equivalent to "null" for certain functions
+var n = 0;
 
 var stored_name = pullAttackValue(atk_index, AG_MUNO_ATTACK_NAME, default_move_name);
 
@@ -2038,7 +2039,7 @@ if (is_array(stored_timeline)){
         for (n = 0; n < array_length_1d(stored_timeline); n++){
             var last_hitbox_frame = 0;
             var test_me = 0;
-            for (hh = 0; get_hitbox_value(atk_index, hh, HG_HITBOX_TYPE); hh++){
+            for (var hh = 0; get_hitbox_value(atk_index, hh, HG_HITBOX_TYPE); hh++){
                 if (get_hitbox_value(atk_index, hh, HG_WINDOW) == stored_timeline[n]){
                     test_me = get_hitbox_value(atk_index, hh, HG_LIFETIME) + get_hitbox_value(atk_index, hh, HG_WINDOW_CREATION_FRAME);
                     if get_hitbox_value(atk_index, hh, HG_HITBOX_TYPE) == 2 test_me = -1;
@@ -2086,9 +2087,11 @@ if (get_attack_value(atk_index, AG_STRONG_CHARGE_WINDOW) != 0){
     if found stored_misc = checkAndAdd(stored_misc, "Charge frame: " + decimalToString(strong_charge_frame));
 }
     
-if is_array(stored_timeline){
+if is_array(stored_timeline)
+{
     var total_frames = 0;
-    for (n = 0; n < array_length_1d(stored_timeline); n++){
+    for (n = 0; n < array_length_1d(stored_timeline); n++)
+    {
         var frames = string(total_frames + 1) + "-" + string(total_frames + get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH));
         switch (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_INVUL)){
             case -1:
@@ -2107,13 +2110,22 @@ if is_array(stored_timeline){
     }
 }
 
+//Cooldown
 if (get_attack_value(atk_index, AG_MUNO_ATTACK_COOLDOWN) != 0)
-    stored_misc = checkAndAdd(stored_misc, "Cooldown: " + string(abs(get_attack_value(atk_index, AG_MUNO_ATTACK_COOLDOWN))) + "f" + ((get_attack_value(atk_index, AG_MUNO_ATTACK_COOLDOWN) > 0) ? "" : " until land/walljump/hit"));
-if (get_attack_value(atk_index, AG_MUNO_ATTACK_MISC_ADD) != 0)
-    stored_misc = checkAndAdd(stored_misc, get_attack_value(atk_index, AG_MUNO_ATTACK_MISC_ADD));
-if (get_attack_value(atk_index, AG_MUNO_ATTACK_MISC) != 0)
-    stored_misc = get_attack_value(atk_index, AG_MUNO_ATTACK_MISC);
+{
+    stored_misc = checkAndAdd(stored_misc, "Cooldown: " 
+                  + string(abs(get_attack_value(atk_index, AG_MUNO_ATTACK_COOLDOWN))) + "f" 
+                  + ((get_attack_value(atk_index, AG_MUNO_ATTACK_COOLDOWN) > 0) ? "" : " until land/walljump/hit"));
+}
 
+//Misc Addition
+if (get_attack_value(atk_index, AG_MUNO_ATTACK_MISC_ADD) != 0)
+{ stored_misc = checkAndAdd(stored_misc, get_attack_value(atk_index, AG_MUNO_ATTACK_MISC_ADD)); }
+//Misc override
+if (get_attack_value(atk_index, AG_MUNO_ATTACK_MISC) != 0)
+{ stored_misc = get_attack_value(atk_index, AG_MUNO_ATTACK_MISC); }
+
+//Insert into move array
 array_push(phone.data, {
     type: 2, // an actual move
     index: atk_index,
@@ -2121,122 +2133,138 @@ array_push(phone.data, {
     length: stored_length,
     ending_lag: stored_ending_lag,
     landing_lag: stored_landing_lag,
-    hitboxes: [],
+    hitboxes: [], //filled below
     page_starts: [0],
     num_hitboxes: get_num_hitboxes(atk_index),
     timeline: stored_timeline,
     misc: stored_misc
 });
 
-for (var l = 1; get_hitbox_value(atk_index, l, HG_HITBOX_TYPE); l++){
-    if !get_hitbox_value(atk_index, l, HG_MUNO_HITBOX_EXCLUDE) initHitbox(array_length(phone.data) - 1, l);
+//parse through all hitboxes of this attack and register them
+for (var hb = 1; get_hitbox_value(atk_index, hb, HG_HITBOX_TYPE); hb++)
+{
+    if !get_hitbox_value(atk_index, hb, HG_MUNO_HITBOX_EXCLUDE) 
+    { initHitbox(array_length(phone.data) - 1, hb); }
 }
 
-
-
+//================================================================================
+// returns move's value of index if it is a string, otherwise returns def.
 #define pullAttackValue(move, index, def)
-
-if is_string(get_attack_value(move, index)) return get_attack_value(move, index);
-else return def;
-
-
-
+{
+    var value = get_attack_value(move, index);
+    return is_string(value) ? value : def;
+}
+//================================================================================
+// Parses attack grid data and assembles the description for one hitbox.
+// inserted directly in phone.data[move_index].hitboxes.
 #define initHitbox(move_index, index)
 
-var def = "-";
-var n = 0;
-
-current_move = move_index;
+var def = "-"; //default value, considered as string-equivalent to "null" for certain functions
 
 var atk_index = phone.data[move_index].index;
 var move = phone.data[move_index];
 var parent = get_hitbox_value(atk_index, index, HG_PARENT_HITBOX);
-if parent == index parent = 0;
+if (parent == index) parent = 0; // Cannot be parent to self
 
+//find active frames
 var stored_active = def;
-if is_array(phone.data[move_index].timeline){
+if is_array(phone.data[move_index].timeline)
+{
     var win = get_hitbox_value(atk_index, index, HG_WINDOW);
     var w_f = get_hitbox_value(atk_index, index, HG_WINDOW_CREATION_FRAME);
     var lif = get_hitbox_value(atk_index, index, HG_LIFETIME);
     var frames_before = 0;
     var has_found = false;
-    for (n = 0; n < array_length_1d(phone.data[move_index].timeline) && !has_found; n++){
-        if (win == phone.data[move_index].timeline[n]){
+    //Scan forward to find creation frame
+    for (var n = 0; n < array_length(phone.data[move_index].timeline) && !has_found; n++)
+    {
+        if (win == phone.data[move_index].timeline[n])
+        {
             frames_before += w_f;
             has_found = true;
         }
-        else{
+        else
+        {
             frames_before += get_window_value(atk_index, phone.data[move_index].timeline[n], AG_WINDOW_LENGTH);
         }
     }
-    if has_found{
+    if (has_found)
+    {
         stored_active = decimalToString(frames_before + 1);
-        if (lif > 1){
+        //Add lifetime to find last active frame
+        if (lif > 1)
+        {
             stored_active += "-";
-            if (get_hitbox_value(atk_index, index, HG_HITBOX_TYPE) == 1){
-                stored_active += decimalToString(frames_before + lif);
-            }
+            if (get_hitbox_value(atk_index, index, HG_HITBOX_TYPE) == 1)
+            { stored_active += decimalToString(frames_before + lif); }
         }
     }
 }
 stored_active = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_ACTIVE, stored_active);
 
-var stored_damage = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_DAMAGE, pullHitboxValue(atk_index, index, HG_DAMAGE, def));
+//Basic properties
+var stored_damage = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_DAMAGE, 
+                                    pullHitboxValue(atk_index, index, HG_DAMAGE, def));
 
-var stored_base_kb = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_BKB, pullHitboxValue(atk_index, index, HG_BASE_KNOCKBACK, "0"));
+var stored_base_kb = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_BKB, 
+                                     pullHitboxValue(atk_index, index, HG_BASE_KNOCKBACK, "0"));
 if get_hitbox_value(atk_index, index, HG_FINAL_BASE_KNOCKBACK) stored_base_kb += "-" + decimalToString(get_hitbox_value(atk_index, index, HG_FINAL_BASE_KNOCKBACK));
 
-var stored_kb_scale = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_KBG, pullHitboxValue(atk_index, index, HG_KNOCKBACK_SCALING, "0"));
+var stored_kb_scale = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_KBG, 
+                                      pullHitboxValue(atk_index, index, HG_KNOCKBACK_SCALING, "0"));
 
 var stored_angle = def;
 if get_hitbox_value(atk_index, index, HG_BASE_KNOCKBACK) stored_angle = decimalToString(get_hitbox_value(atk_index, index, HG_ANGLE));
 else if get_hitbox_value(atk_index, parent, HG_BASE_KNOCKBACK) stored_angle = decimalToString(get_hitbox_value(atk_index, parent, HG_ANGLE));
-var flipper = max(get_hitbox_value(atk_index, index, HG_ANGLE_FLIPPER), get_hitbox_value(atk_index, parent, HG_ANGLE_FLIPPER));
-// if flipper stored_angle += "*";
 
-var stored_priority = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_PRIORITY, pullHitboxValue(atk_index, index, HG_PRIORITY, (move.num_hitboxes > 1) ? "0" : def));
+var stored_base_hitpause = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_BHP, 
+                                           pullHitboxValue(atk_index, index, HG_BASE_HITPAUSE, "0"));
+var stored_hitpause_scale = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_HPG, 
+                                            pullHitboxValue(atk_index, index, HG_HITPAUSE_SCALING, "0"));
 
-var stored_group = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_GROUP, pullHitboxValue(atk_index, index, HG_HITBOX_GROUP, (move.num_hitboxes > 1) ? "0" : def));
+//Those two only make sense when a move has multiple hitboxes so default value can be different
+var stored_priority = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_PRIORITY, 
+                                      pullHitboxValue(atk_index, index, HG_PRIORITY, (move.num_hitboxes > 1) ? "0" : def));
+var stored_group = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_GROUP, 
+                                   pullHitboxValue(atk_index, index, HG_HITBOX_GROUP, (move.num_hitboxes > 1) ? "0" : def));
 
-var stored_base_hitpause = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_BHP, pullHitboxValue(atk_index, index, HG_BASE_HITPAUSE, "0"));
-
-var stored_hitpause_scale = pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_HPG, pullHitboxValue(atk_index, index, HG_HITPAUSE_SCALING, "0"));
-
-var flipper_desc = [
-    "sends at the exact same angle every time",
-    "sends away from the center of the user",
-    "sends toward the center of the user",
-    "horizontal KB sends away from the hitbox center",
-    "horizontal KB sends toward the hitbox center",
-    "horizontal KB is reversed",
-    "horizontal KB sends away from the user",
-    "horizontal KB sends toward the user",
-    "sends away from the hitbox center",
-    "sends toward the hitbox center",
-    "sends along the user's movement direction"
-];
-
-var effect_desc = ["nothing", "burn", "burn consume", "burn stun", "wrap", "freeze", "mark", "???", "auto wrap", "polite", "poison", "plasma stun", "crouchable"];
-
-var ground_desc = ["woag", "Hits only grounded enemies", "Hits only airborne enemies"];
-
-var tech_desc = ["woag", "Untechable", "Hit enemy goes through platforms", "Untechable, doesn't bounce"];
-
-var flinch_desc = ["woag", "Forces grounded foes to flinch", "Cannot force flinch", "Forces crouching opponents to flinch"];
-
-var rock_desc = ["woag", "Throws rocks", "Ignores rocks"];
-
+//Miscellaneous information 
 var stored_misc = def;
-if (stored_group != def)
-    stored_misc = checkAndAdd(stored_misc, "Group " + stored_group);
-if parent{
-    stored_misc = checkAndAdd(stored_misc, "Parent: Hitbox #" + string(parent));
-}
-else{
-    if (flipper)
+if (stored_group != def) stored_misc = checkAndAdd(stored_misc, "Group " + stored_group);
+
+// Inherit from parent; so just note parent
+if (parent) stored_misc = checkAndAdd(stored_misc, "Parent: Hitbox #" + string(parent));
+else
+{
+    //Misc. information common strings in array format
+    var flipper_desc = [
+        "sends at the exact same angle every time",
+        "sends away from the center of the user",
+        "sends toward the center of the user",
+        "horizontal KB sends away from the hitbox center",
+        "horizontal KB sends toward the hitbox center",
+        "horizontal KB is reversed",
+        "horizontal KB sends away from the user",
+        "horizontal KB sends toward the user",
+        "sends away from the hitbox center",
+        "sends toward the hitbox center",
+        "sends along the user's movement direction"
+    ];
+    var effect_desc = ["nothing", "burn", "burn consume", "burn stun", "wrap", "freeze", "mark", 
+                        "???", "auto wrap", "polite", "poison", "plasma stun", "crouchable"];
+    var ground_desc = ["woag", "Hits only grounded enemies", "Hits only airborne enemies"];
+    var tech_desc = ["woag", "Untechable", "Hit enemy goes through platforms", "Untechable, doesn't bounce"];
+    var flinch_desc = ["woag", "Forces grounded foes to flinch", "Cannot force flinch", "Forces crouching opponents to flinch"];
+    var rock_desc = ["woag", "Throws rocks", "Ignores rocks"];
+
+    //Extract from hitbox
+    var flipper = get_hitbox_value(atk_index, index, HG_ANGLE_FLIPPER);
+    if (flipper > 0)
         stored_misc = checkAndAdd(stored_misc, "Flipper " + decimalToString(flipper) + " (" + flipper_desc[flipper] + ")");
     if (pullHitboxValue(atk_index, index, HG_EFFECT, def) != def)
-        stored_misc = checkAndAdd(stored_misc, "Effect " + decimalToString(get_hitbox_value(atk_index, index, HG_EFFECT)) + ((real(pullHitboxValue(atk_index, index, HG_EFFECT, def)) < array_length(effect_desc)) ? " (" + effect_desc[real(pullHitboxValue(atk_index, index, HG_EFFECT, def))] + ")" : " (Custom)"));
+        stored_misc = checkAndAdd(stored_misc, "Effect " + decimalToString(get_hitbox_value(atk_index, index, HG_EFFECT)) 
+                                  + ((real(pullHitboxValue(atk_index, index, HG_EFFECT, def)) < array_length(effect_desc)) ? 
+                                         " (" + effect_desc[real(pullHitboxValue(atk_index, index, HG_EFFECT, def))] + ")" : " (Custom)"));
     if (pullHitboxValue(atk_index, index, HG_EXTRA_HITPAUSE, def) != def)
         stored_misc = checkAndAdd(stored_misc, decimalToString(get_hitbox_value(atk_index, index, HG_EXTRA_HITPAUSE)) + " Extra Hitpause");
     if (pullHitboxValue(atk_index, index, HG_GROUNDEDNESS, def) != def)
@@ -2268,19 +2296,22 @@ else{
     if (pullHitboxValue(atk_index, index, HG_PROJECTILE_PLASMA_SAFE, def) != def)
         stored_misc = checkAndAdd(stored_misc, "Immune to Clairen's plasma field");
     if (pullHitboxValue(atk_index, index, HG_MUNO_OBJECT_LAUNCH_ANGLE, def) != def)
-        stored_misc = checkAndAdd(stored_misc, decimalToString(get_hitbox_value(atk_index, index, HG_MUNO_OBJECT_LAUNCH_ANGLE)) + " Workshop Object launch angle");
+        stored_misc = checkAndAdd(stored_misc, decimalToString(get_hitbox_value(atk_index, index, HG_MUNO_OBJECT_LAUNCH_ANGLE)) 
+                                               + " Workshop Object launch angle");
 }
 
+//Miscellaneous override
 if (get_hitbox_value(atk_index, index, HG_MUNO_HITBOX_MISC_ADD) != 0)
     stored_misc = checkAndAdd(stored_misc, get_hitbox_value(atk_index, index, HG_MUNO_HITBOX_MISC_ADD));
 if (get_hitbox_value(atk_index, index, HG_MUNO_HITBOX_MISC) != 0)
     stored_misc = get_hitbox_value(atk_index, index, HG_MUNO_HITBOX_MISC);
 
-var stored_name = string(index) + ": " + pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_NAME, ((get_hitbox_value(atk_index, index, HG_HITBOX_TYPE) == 1) ? "Melee" : "Proj."));
+//Name (else, uses "Melee" or "Proj.")
+var default_name = (get_hitbox_value(atk_index, index, HG_HITBOX_TYPE) == 1) ? "Melee" : "Proj.";
+var stored_name = string(index) + ": " + pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_NAME, default_name);
 
-
-
-array_push(phone.data[current_move].hitboxes, {
+//Insert into hitbox array
+array_push(phone.data[move_index].hitboxes, {
     name: stored_name,
     active: stored_active,
     damage: stored_damage,
@@ -2288,7 +2319,6 @@ array_push(phone.data[current_move].hitboxes, {
     kb_scale: stored_kb_scale,
     angle: stored_angle,
     priority: stored_priority,
-    // group: stored_group,
     base_hitpause: stored_base_hitpause,
     hitpause_scale: stored_hitpause_scale,
     misc: stored_misc,
@@ -2296,57 +2326,80 @@ array_push(phone.data[current_move].hitboxes, {
 });
 
 
-
+//================================================================================
+// returns move's hbox's data value of index (converted to string as necessary).
+// if it is zero, returns def instead. considers HG_PARENT_HITBOX inheritance.
 #define pullHitboxValue(move, hbox, index, def)
+{
+    if (get_hitbox_value(move, hbox, HG_PARENT_HITBOX) != 0) switch(index)
+    {
+        case HG_HITBOX_TYPE:
+        case HG_WINDOW:
+        case HG_WINDOW_CREATION_FRAME:
+        case HG_LIFETIME:
+        case HG_HITBOX_X:
+        case HG_HITBOX_Y:
+        case HG_HITBOX_GROUP:
+            break;
+        default:
+            if (index < 70) hbox = get_hitbox_value(move, hbox, HG_PARENT_HITBOX);
+            break;
+    }
 
-if get_hitbox_value(move, hbox, HG_PARENT_HITBOX) != 0 switch(index){
-    case HG_HITBOX_TYPE:
-    case HG_WINDOW:
-    case HG_WINDOW_CREATION_FRAME:
-    case HG_LIFETIME:
-    case HG_HITBOX_X:
-    case HG_HITBOX_Y:
-    case HG_HITBOX_GROUP:
-        break;
-    default:
-        if index < 70 hbox = get_hitbox_value(move, hbox, HG_PARENT_HITBOX);
+    var value = get_hitbox_value(move, hbox, index);
+    //convert to string
+    if (value != 0) || is_string(value) return decimalToString(value);
+    else return string(def);
 }
 
-if get_hitbox_value(move, hbox, index) != 0 || is_string(get_hitbox_value(move, hbox, index)) return decimalToString(get_hitbox_value(move, hbox, index));
-else return string(def);
-
-
-
+//================================================================================
+// concatenates strings using separators.
+// inserts line breaks automatically if it doesnt fit a full line.
 #define checkAndAdd(orig, add)
+{
+    var orig_str = decimalToString(orig);
+    var add_str = decimalToString(add);
 
-if orig == "-" return decimalToString(add);
-if string_height_ext(decimalToString(orig) + "   |   " + decimalToString(add), 10, 560) == string_height_ext(decimalToString(orig), 10, 560){
-    return decimalToString(orig) + "   |   " + decimalToString(add);
+    //Trivial case: orig is empty
+    if (orig == "-") return add_str;
+
+    var separator = "   |   ";
+    var line_break = "
+"; //formatting pls
+    
+    var line_w = 560;
+    if (string_height_ext(orig_str + separator + add_str, 10, line_w) 
+        == string_height_ext(orig_str, 10, line_w))
+    {
+        return orig_str + separator + add_str;
+    }
+    return orig_str + line_break + add_str;
 }
-return decimalToString(orig) + "
-" + decimalToString(add);
 
-
-
+//================================================================================
+// returns input as a string value, up to two decimal places.
 #define decimalToString(input)
+{
+    //Not a number: attempt to convert to string but leave as is
+    if !is_number(input) return(string(input));
 
-if !is_number(input) return(string(input));
+    input = input % 1000; //maximum
 
-input = input % 1000;
+    input = string(input); //converted to string (two decimal places)
 
-input = string(input);
-var last_char = string_char_at(input, string_length(input));
+    if (string_length(input) > 2)
+    {
+        var last_char = string_char_at(input, string_length(input));
+        var third_last_char = string_char_at(input, string_length(input) - 2);
+        // crops "1.20" to "1.2"
+        if (last_char == "0" && third_last_char == ".") 
+        { input = string_delete(input, string_length(input), 1); }
+    }
 
-if (string_length(input) > 2){
-    var third_last_char = string_char_at(input, string_length(input) - 2);
-    if (last_char == "0" && third_last_char == ".") input = string_delete(input, string_length(input), 1);
+    if (string_char_at(input, 1) == "0") input = string_delete(input, 1, 1);
+
+    return input;
 }
-
-if (string_char_at(input, 1) == "0") input = string_delete(input, 1, 1);
-
-return input;
-
-
 //================================================================================
 //return TRUE if detecting an online mode
 #define detect_online()

@@ -382,6 +382,16 @@ USER FEATURES
 
  Frame Data
   Reloading frame data
+   loadFrameData
+    - phone.move_ordering
+    - phone.include_stats
+    - phone.include_custom
+    initStats
+    initCustom
+    initMove
+     - phone.data
+     - checkAndAdd()
+     - decimalToString()
   Stats page
    - DATAtype::1
    - phone.stats_notes
@@ -464,8 +474,11 @@ GENERAL INTERFACE
   - phone.apps[].array
   - phone.cursor
   - phone.scroll_dist
-  - phone.target_scroll_dist
-  - phone.screen_width
+  Scrolling
+   - phone.target_scroll_dist
+   - phone.screen_width
+   - phone.last_text_size
+   - textDraw()
 
 CSS NAMES
  - use_alt_names
@@ -514,6 +527,8 @@ DEPENDENCIES
  - phone.tips
  - phone.currently_edited_obj
  decimalToString
+ checkAndAdd
+ - decimalToString
 
 USER CONTROL VARIABLES
  use_alt_names
@@ -522,6 +537,12 @@ USER CONTROL VARIABLES
 NOTES
  + Need focus switch to big screen for Runes settings
  + Greenscreen util inneficient: still renders the text behind it
+
+ + Frame data loading assumes attack grid is sane
+   ...Rivals does too.
+ + Block of frame data Misc uses function that checks for parent when there is none as per condition
+ + Frame data load inneficiency: overrides checked AFTER algorithm tries to determine grid value 
+ + Frame data load Angle and Final_Knockback use get_hitbox_value directly; why? possible bugs?
  */
 
 /*
@@ -574,35 +595,35 @@ UTILtype
 //single-state options "triggered" instead of switched
 
 DATAtype
- type: int -> [1, 2, 3]
+ type: int -> 1,2,3
  name: string
 DATAtype::1 -> Stats
 DATAtype::2 -> Moves
- index:
+ index: int
  length: string
  ending_lag: string
  landing_lag: string
  hitboxes: [HBDATAtype]
  page_starts: [int]
  num_hitboxes: int
- timeline: 
+ timeline: [int] //indexes of windows
  misc: string
 DATAtype::3 -> Custom
 
 HBDATAtype
  name: string
- active:
- damage:
- base_kb:
- kb_scale:
- angle:
- priority:
- base_hitpause:
- hitpause_scale:
+ active: string
+ damage: string
+ base_kb: string
+ kb_scale: string
+ angle: string
+ priority: string
+ base_hitpause: string
+ hitpause_scale: string
  parent_hbox: int
  misc: string
 
 CUSTOMFDtype
- type: int [0, 1]
+ type: int -> 0,1
  content: string
 */

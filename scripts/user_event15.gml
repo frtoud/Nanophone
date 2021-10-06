@@ -561,8 +561,8 @@ initCFDBody("epic");
 
 for (var ii = 0; ii < 17; ii++)
 {
-initCFDHeader("Does this bug you");
-initCFDBody("yes");
+    initCFDHeader("Does this bug you");
+    initCFDBody("yes");
 }
 
 
