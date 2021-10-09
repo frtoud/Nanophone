@@ -2,7 +2,11 @@
 
 draw_set_valign(fa_top)
 
-switch(muno_event_type){
+//swap regular phone with codegenerated assistant one
+if ("debug_nanophone" in self && debug_nanophone) { user_event(13); exit; }
+
+switch(muno_event_type)
+{
     case 0: // init
         CORE_init();
         break;

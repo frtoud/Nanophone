@@ -176,5 +176,7 @@ bubble_y = 8;
 // MunoPhone Touch code - don't touch
 // should be at BOTTOM of file, but above any #define lines
 
+debug_nanophone = false;
+
 muno_event_type = 0;
 user_event(14);
