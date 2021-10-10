@@ -1,10 +1,6 @@
-// phone - backend
-
+// phone - backend - Generated through assistant
 draw_set_valign(fa_top)
 
-//swap regular phone with codegenerated assistant one
-// NO-INJECT for this file
-if ("debug_nanophone" in self && debug_nanophone) { user_event(13); exit; }
 
 switch(muno_event_type)
 {
@@ -2405,6 +2401,7 @@ array_push(phone.data[move_index].hitboxes, {
 
     return input;
 }
+
 //================================================================================
 //return TRUE if detecting an online mode
 #define detect_online()
