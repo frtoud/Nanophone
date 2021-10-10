@@ -2326,93 +2326,6 @@ array_push(phone.data[move_index].hitboxes, {
     parent_hbox: parent
 });
 
-
-//================================================================================
-// returns move's hbox's data value of index (converted to string as necessary).
-// if it is zero, returns def instead. considers HG_PARENT_HITBOX inheritance.
-#define pullHitboxValue(move, hbox, index, def)
-{
-    if (get_hitbox_value(move, hbox, HG_PARENT_HITBOX) != 0) switch(index)
-    {
-        case HG_HITBOX_TYPE:
-        case HG_WINDOW:
-        case HG_WINDOW_CREATION_FRAME:
-        case HG_LIFETIME:
-        case HG_HITBOX_X:
-        case HG_HITBOX_Y:
-        case HG_HITBOX_GROUP:
-            break;
-        default:
-            if (index < 70) hbox = get_hitbox_value(move, hbox, HG_PARENT_HITBOX);
-            break;
-    }
-
-    var value = get_hitbox_value(move, hbox, index);
-    //convert to string
-    if (value != 0) || is_string(value) return decimalToString(value);
-    else return string(def);
-}
-
-//================================================================================
-// concatenates strings using separators.
-// inserts line breaks automatically if it doesnt fit a full line.
-#define checkAndAdd(orig, add)
-{
-    var orig_str = decimalToString(orig);
-    var add_str = decimalToString(add);
-
-    //Trivial case: orig is empty
-    if (orig == "-") return add_str;
-
-    var separator = "   |   ";
-    var line_break = "
-"; //formatting pls
-    
-    var line_w = 560;
-    if (string_height_ext(orig_str + separator + add_str, 10, line_w) 
-        == string_height_ext(orig_str, 10, line_w))
-    {
-        return orig_str + separator + add_str;
-    }
-    return orig_str + line_break + add_str;
-}
-
-//================================================================================
-// returns input as a string value, up to two decimal places.
-#define decimalToString(input)
-{
-    //Not a number: attempt to convert to string but leave as is
-    if !is_number(input) return(string(input));
-
-    input = input % 1000; //maximum
-
-    input = string(input); //converted to string (two decimal places)
-
-    if (string_length(input) > 2)
-    {
-        var last_char = string_char_at(input, string_length(input));
-        var third_last_char = string_char_at(input, string_length(input) - 2);
-        // crops "1.20" to "1.2"
-        if (last_char == "0" && third_last_char == ".") 
-        { input = string_delete(input, string_length(input), 1); }
-    }
-
-    if (string_char_at(input, 1) == "0") input = string_delete(input, 1, 1);
-
-    return input;
-}
-
-//================================================================================
-//return TRUE if detecting an online mode
-#define detect_online()
-{
-    for (var cur = 0; cur < 4; cur++)
-    {
-        if (get_player_hud_color(cur+1) == $64e542) //online-only color 
-            return true;
-    }
-    return false;
-}
 //================================================================================
 #define spawn_base_dust // originally by supersonic
 /// spawn_base_dust(x, y, name, dir = 0)
@@ -2447,3 +2360,97 @@ newdust.dust_color = dust_color; //set the dust color
 if dir != 0 newdust.spr_dir = dir; //set the spr_dir
 newdust.draw_angle = dfa;
 return newdust;
+
+//================================================================================
+
+// vvv LIBRARY DEFINES AND MACROS vvv
+// DANGER File below this point will be overwritten! Generated defines and macros below.
+// Write NO-INJECT in a comment above this area to disable injection.
+#define detect_online // Version 0
+    // return TRUE if detecting online mode
+    // ================================================================================
+    {
+        for (var cur = 0; cur < 4; cur++)
+        {
+            if (get_player_hud_color(cur+1) == $64e542) //online-only color
+                return true;
+        }
+        return false;
+    }
+
+    //================================================================================
+
+#define decimalToString(input) // Version 0
+    // returns input as a string value, up to two decimal places.
+    // ================================================================================
+
+    //Not a number: attempt to convert to string but leave as is
+    if !is_number(input) return(string(input));
+
+    input = input % 1000; //maximum
+
+    input = string(input); //converted to string (two decimal places)
+
+    if (string_length(input) > 2)
+    {
+        var last_char = string_char_at(input, string_length(input));
+        var third_last_char = string_char_at(input, string_length(input) - 2);
+        // crops "1.20" to "1.2"
+        if (last_char == "0" && third_last_char == ".")
+        { input = string_delete(input, string_length(input), 1); }
+    }
+
+    if (string_char_at(input, 1) == "0") input = string_delete(input, 1, 1);
+
+    return input;
+
+#define pullHitboxValue(move, hbox, index, def) // Version 0
+    // returns move's hbox's data value of index (converted to string as necessary).
+    // if it is zero, returns def instead. considers HG_PARENT_HITBOX inheritance.
+
+    if (get_hitbox_value(move, hbox, HG_PARENT_HITBOX) != 0)
+    switch(index)
+    {
+        case HG_HITBOX_TYPE:
+        case HG_WINDOW:
+        case HG_WINDOW_CREATION_FRAME:
+        case HG_LIFETIME:
+        case HG_HITBOX_X:
+        case HG_HITBOX_Y:
+        case HG_HITBOX_GROUP:
+            break;
+        default:
+            if (index < 70) hbox = get_hitbox_value(move, hbox, HG_PARENT_HITBOX);
+            break;
+    }
+
+    var value = get_hitbox_value(move, hbox, index);
+    //convert to string
+    if (value != 0) || is_string(value) return decimalToString(value);
+    else return string(def);
+
+
+    //================================================================================
+
+#define checkAndAdd(orig, add) // Version 0
+    // concatenates strings using separators.
+    // inserts line breaks automatically if it doesnt fit a full line.
+
+    var orig_str = decimalToString(orig);
+    var add_str = decimalToString(add);
+
+    //Trivial case: orig is empty
+    if (orig == "-") return add_str;
+
+    var separator = "   |   ";
+    var line_break = "
+    "; //formatting pls
+
+    var line_w = 560;
+    if (string_height_ext(orig_str + separator + add_str, 10, line_w)
+        == string_height_ext(orig_str, 10, line_w))
+    {
+        return orig_str + separator + add_str;
+    }
+    return orig_str + line_break + add_str;
+// DANGER: Write your code ABOVE the LIBRARY DEFINES AND MACROS header or it will be overwritten!
