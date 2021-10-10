@@ -4,6 +4,14 @@ muno_event_type = 4;
 user_event(14);
 
 
+if (string_pos("*", keyboard_string) > 0)
+{
+    //toggle phone type
+    debug_nanophone = !debug_nanophone;
+    print(debug_nanophone ? "codegen phone" : "original phone")
+}
+keyboard_string = "";
+
 
 if phone_attacking && attack == AT_TAUNT_2{
 	shader_start();
