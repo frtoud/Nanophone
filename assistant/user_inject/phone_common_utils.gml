@@ -15,20 +15,17 @@ STRUCTURES:
 #define detect_online()
 //return TRUE if detecting online mode
 //================================================================================
+for (var cur = 0; cur < 4; cur++)
 {
-    for (var cur = 0; cur < 4; cur++)
-    {
-        if (get_player_hud_color(cur+1) == $64e542) //online-only color 
-            return true;
-    }
-    return false;
+    if (get_player_hud_color(cur+1) == $64e542) //online-only color 
+        return true;
 }
+return false;
 
 //================================================================================
 #define decimalToString(input)
 // returns input as a string value, up to two decimal places.
 //================================================================================
-
 //Not a number: attempt to convert to string but leave as is
 if !is_number(input) return(string(input));
 
