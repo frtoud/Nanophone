@@ -33,14 +33,14 @@ STRUCTURES:
 
 var def = "-"; //default value, considered as string-equivalent to "null" for certain functions
 
-var atk_index = phone.data[move_index].index;
 var move = phone.data[move_index];
+var atk_index = move.index;
 var parent = get_hitbox_value(atk_index, index, HG_PARENT_HITBOX);
 if (parent == index) parent = 0; // Cannot be parent to self
 
 //find active frames
 var stored_active = def;
-if is_array(phone.data[move_index].timeline)
+if is_array(move.timeline)
 {
     var win = get_hitbox_value(atk_index, index, HG_WINDOW);
     var w_f = get_hitbox_value(atk_index, index, HG_WINDOW_CREATION_FRAME);
@@ -48,16 +48,16 @@ if is_array(phone.data[move_index].timeline)
     var frames_before = 0;
     var has_found = false;
     //Scan forward to find creation frame
-    for (var n = 0; n < array_length(phone.data[move_index].timeline) && !has_found; n++)
+    for (var n = 0; n < array_length(move.timeline) && !has_found; n++)
     {
-        if (win == phone.data[move_index].timeline[n])
+        if (win == move.timeline[n])
         {
             frames_before += w_f;
             has_found = true;
         }
         else
         {
-            frames_before += get_window_value(atk_index, phone.data[move_index].timeline[n], AG_WINDOW_LENGTH);
+            frames_before += get_window_value(atk_index, move.timeline[n], AG_WINDOW_LENGTH);
         }
     }
     if (has_found)
@@ -105,7 +105,7 @@ var stored_misc = def;
 if (stored_group != def) stored_misc = checkAndAdd(stored_misc, "Group " + stored_group);
 
 // Inherit from parent; so just note parent
-if (parent) stored_misc = checkAndAdd(stored_misc, "Parent: Hitbox ¤" + string(parent));
+if (parent) stored_misc = checkAndAdd(stored_misc, "Parent: Hitbox [NUMBER-SYMBOL]" + string(parent));
 else
 {
     //Misc. information common strings in array format
@@ -183,7 +183,7 @@ var default_name = (get_hitbox_value(atk_index, index, HG_HITBOX_TYPE) == 1) ? "
 var stored_name = string(index) + ": " + pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_NAME, default_name);
 
 //Insert into hitbox array
-array_push(phone.data[move_index].hitboxes, {
+array_push(move.hitboxes, {
     name: stored_name,
     active: stored_active,
     damage: stored_damage,
@@ -199,19 +199,19 @@ array_push(phone.data[move_index].hitboxes, {
 
 
 //================================================================================
-#define pullAttackValue(move, index, def)
+#define pullAttackValue(atk_index, index, def)
 // returns move's value of index if it is a string, otherwise returns def.
 //================================================================================
-var value = get_attack_value(move, index);
+var value = get_attack_value(atk_index, index);
 return is_string(value) ? value : def;
 
 
 //================================================================================
-#define pullHitboxValue(move, hbox, index, def)
-// returns move's hbox's data value of index (converted to string as necessary).
+#define pullHitboxValue(atk_index, hbox, index, def)
+// returns atk_index's hbox's data value of index (converted to string as necessary).
 // if it is zero, returns def instead. considers HG_PARENT_HITBOX inheritance.
 //================================================================================
-if (get_hitbox_value(move, hbox, HG_PARENT_HITBOX) != 0) 
+if (get_hitbox_value(atk_index, hbox, HG_PARENT_HITBOX) != 0) 
 switch(index)
 {
     case HG_HITBOX_TYPE:
@@ -223,11 +223,11 @@ switch(index)
     case HG_HITBOX_GROUP:
         break;
     default:
-        if (index < 70) hbox = get_hitbox_value(move, hbox, HG_PARENT_HITBOX);
+        if (index < 70) hbox = get_hitbox_value(atk_index, hbox, HG_PARENT_HITBOX);
         break;
 }
 
-var value = get_hitbox_value(move, hbox, index);
+var value = get_hitbox_value(atk_index, hbox, index);
 //convert to string
 if (value != 0) || is_string(value) return decimalToString(value);
 else return string(def);
