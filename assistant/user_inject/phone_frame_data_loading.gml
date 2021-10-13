@@ -4,7 +4,26 @@
   Functions that collect and format Frame Data pages.
   Part of the "DATA" phone feature.
 
-STRUCTURES:
+ DECLARATIONS:
+  - 
+
+ STRUCTURES:
+  - DATAtype (FrameData page Union)
+     name: string
+     type: int -> [1,2,3] (Union selection)
+    DATAtype::1 (Stats Page)
+    DATAtype::2 (Move Page)
+     index: int (Attack index of this move)
+     length: string
+     ending_lag: string
+     landing_lag: string
+     hitboxes: [HBDATAtype] (List of hitbox data)
+     num_hitboxes: int ()
+     page_starts: [int] (See: Page subsystem)
+     timeline: [int] (indexes of windows in the order they should execute)
+     misc: string (Additional information)
+    DATAtype::3 (Custom Data Page)
+
   - HBDATAtype (compiled hitbox data strings)
      name: string
      active: string
@@ -26,14 +45,13 @@ STRUCTURES:
 
 
 //================================================================================
-#define initHitbox(move_index, index)
+#define initHitbox(move, index)
 // Parses attack grid data and assembles the description for one hitbox.
-// inserted directly in phone.data[move_index].hitboxes.
+// inserted directly in move.hitboxes.
 //================================================================================
 
 var def = "-"; //default value, considered as string-equivalent to "null" for certain functions
 
-var move = phone.data[move_index];
 var atk_index = move.index;
 var parent = get_hitbox_value(atk_index, index, HG_PARENT_HITBOX);
 if (parent == index) parent = 0; // Cannot be parent to self
@@ -182,7 +200,7 @@ if (get_hitbox_value(atk_index, index, HG_MUNO_HITBOX_MISC) != 0)
 var default_name = (get_hitbox_value(atk_index, index, HG_HITBOX_TYPE) == 1) ? "Melee" : "Proj.";
 var stored_name = string(index) + ": " + pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_NAME, default_name);
 
-//Insert into hitbox array
+//Insert into hitboxes array
 array_push(move.hitboxes, {
     name: stored_name,
     active: stored_active,

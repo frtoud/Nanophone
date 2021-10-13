@@ -2127,7 +2127,7 @@ if (get_attack_value(atk_index, AG_MUNO_ATTACK_MISC) != 0)
 { stored_misc = get_attack_value(atk_index, AG_MUNO_ATTACK_MISC); }
 
 //Insert into move array
-array_push(phone.data, {
+var current_move = {
     type: 2, // an actual move
     index: atk_index,
     name: stored_name,
@@ -2139,13 +2139,14 @@ array_push(phone.data, {
     num_hitboxes: get_num_hitboxes(atk_index),
     timeline: stored_timeline,
     misc: stored_misc
-});
+};
+array_push(phone.data, current_move);
 
 //parse through all hitboxes of this attack and register them
 for (var hb = 1; get_hitbox_value(atk_index, hb, HG_HITBOX_TYPE); hb++)
 {
     if !get_hitbox_value(atk_index, hb, HG_MUNO_HITBOX_EXCLUDE) 
-    { initHitbox(array_length(phone.data) - 1, hb); }
+    { initHitbox(current_move, hb); }
 }
 
 //================================================================================
@@ -2223,14 +2224,13 @@ return newdust;
 
     return input;
 
-#define initHitbox(move_index, index) // Version 0
+#define initHitbox(move, index) // Version 0
     // Parses attack grid data and assembles the description for one hitbox.
-    // inserted directly in phone.data[move_index].hitboxes.
+    // inserted directly in move.hitboxes.
     // ================================================================================
 
     var def = "-"; //default value, considered as string-equivalent to "null" for certain functions
 
-    var move = phone.data[move_index];
     var atk_index = move.index;
     var parent = get_hitbox_value(atk_index, index, HG_PARENT_HITBOX);
     if (parent == index) parent = 0; // Cannot be parent to self
@@ -2379,7 +2379,7 @@ return newdust;
     var default_name = (get_hitbox_value(atk_index, index, HG_HITBOX_TYPE) == 1) ? "Melee" : "Proj.";
     var stored_name = string(index) + ": " + pullHitboxValue(atk_index, index, HG_MUNO_HITBOX_NAME, default_name);
 
-    //Insert into hitbox array
+    //Insert into hitboxes array
     array_push(move.hitboxes, {
         name: stored_name,
         active: stored_active,
