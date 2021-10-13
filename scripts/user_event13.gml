@@ -1879,13 +1879,12 @@ if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || (attack == AT_PHONE
 #define loadFrameData
 // Initializes Data app's pages
 //========================================================================================================
-
-i = 0; // i = current spot in the registered move list
-
+//Reserve the special stats and custom pages
 if (phone.include_stats) initStats();
 if (phone.include_custom) initCustom();
 
-for (j = 0; j < array_length_1d(phone.move_ordering); j++)  // j = index in array of ordered attack indexes
+//list all moves, from the array of ordered attack indexes
+for (j = 0; j < array_length(phone.move_ordering); j++)
 {
     var current_attack_index = phone.move_ordering[j];
     if !get_attack_value(current_attack_index, AG_MUNO_ATTACK_EXCLUDE)
