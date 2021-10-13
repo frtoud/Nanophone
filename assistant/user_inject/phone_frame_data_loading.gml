@@ -65,8 +65,12 @@
      misc: string
 
  DEPENDS ON:
+  - phone.move_ordering: [int]
+  - phone.include_stats: bool
+  - phone.include_custom: bool
+  - phone.custom_name: string
   - phone.data: [DATAPAGEtype]
-  - phone_common_utils
+  - MODULE phone_common_utils
      decimalToString
   - AG_MUNO_WINDOW_INVUL
   - AG_MUNO_ATTACK_COOLDOWN
@@ -149,6 +153,26 @@ ORIGINAL DOCUMENTATION:
 
 */
 //===========================================
+
+//========================================================================================================
+#define loadFrameData
+// Initializes Data app's pages, according to the phone.move_ordering list.
+//========================================================================================================
+//Reserve the special stats and custom pages
+if (phone.include_stats) initStats();
+if (phone.include_custom) initCustom();
+
+//list all moves, from the array of ordered attack indexes
+for (j = 0; j < array_length(phone.move_ordering); j++)
+{
+    var current_attack_index = phone.move_ordering[j];
+    if !get_attack_value(current_attack_index, AG_MUNO_ATTACK_EXCLUDE)
+    && (get_window_value(current_attack_index, 1, AG_WINDOW_LENGTH) 
+    ||  get_hitbox_value(current_attack_index, 1, HG_HITBOX_TYPE)) 
+    {
+        initMove(current_attack_index, phone.attack_names[current_attack_index]);
+    }
+}
 
 //=======================================================================================
 #define initStats

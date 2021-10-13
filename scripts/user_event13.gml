@@ -1875,26 +1875,6 @@ if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || (attack == AT_PHONE
 }
 
 
-//========================================================================================================
-#define loadFrameData
-// Initializes Data app's pages
-//========================================================================================================
-//Reserve the special stats and custom pages
-if (phone.include_stats) initStats();
-if (phone.include_custom) initCustom();
-
-//list all moves, from the array of ordered attack indexes
-for (j = 0; j < array_length(phone.move_ordering); j++)
-{
-    var current_attack_index = phone.move_ordering[j];
-    if !get_attack_value(current_attack_index, AG_MUNO_ATTACK_EXCLUDE)
-    && (get_window_value(current_attack_index, 1, AG_WINDOW_LENGTH) 
-    ||  get_hitbox_value(current_attack_index, 1, HG_HITBOX_TYPE)) 
-    {
-        initMove(current_attack_index, phone.attack_names[current_attack_index]);
-    }
-}
-
 #define spawn_base_dust // originally by supersonic
 /// spawn_base_dust(x, y, name, dir = 0)
 ///spawn_base_dust(x, y, name, ?dir)
@@ -2005,6 +1985,27 @@ return newdust;
         gpu_set_blendmode(bm_normal);
         draw_set_alpha(1);
     }
+
+#define loadFrameData // Version 0
+    // Initializes Data app's pages, according to the phone.move_ordering list.
+    // ========================================================================================================
+    // Reserve the special stats and custom pages
+    if (phone.include_stats) initStats();
+    if (phone.include_custom) initCustom();
+
+    //list all moves, from the array of ordered attack indexes
+    for (j = 0; j < array_length(phone.move_ordering); j++)
+    {
+        var current_attack_index = phone.move_ordering[j];
+        if !get_attack_value(current_attack_index, AG_MUNO_ATTACK_EXCLUDE)
+        && (get_window_value(current_attack_index, 1, AG_WINDOW_LENGTH)
+        ||  get_hitbox_value(current_attack_index, 1, HG_HITBOX_TYPE))
+        {
+            initMove(current_attack_index, phone.attack_names[current_attack_index]);
+        }
+    }
+
+    //=======================================================================================
 
 #define initStats // Version 0
     // Reserves a page for general character stats
