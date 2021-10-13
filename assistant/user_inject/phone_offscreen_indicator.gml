@@ -20,6 +20,27 @@
 
  USED IN:
   - HUD draw event
+
+ORIGINAL DOCUMENTATION:
+  phone_offscreen
+    This is an array that stores the instance IDs of objects (e.g. articles,
+    projectiles, or whatever you want) which should have an offscreen indicator
+    drawn for them. To use this, run this code from within that object, e.g.
+    in hitbox_init or articleX_init:
+
+    array_push(player_id.phone_offscreen, self);
+    phone_offscr_sprite = sprite_get("..."); // icon to display
+    phone_offscr_index = 0; // image_index of the icon
+    phone_offscr_x_offset = 0; // x offset to draw the arrow at; uses spr_dir
+    phone_offscr_y_offset = 0; // y offset to draw the arrow at
+    phone_offscr_leeway = 16; // approximate width/height of obj
+
+    An example icon can be found in the sprites folder:
+
+    _pho_offscreen_example.png
+
+    (it doesn't need a load.gml offset)
+
 */
 //===========================================
 

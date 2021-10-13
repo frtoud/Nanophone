@@ -67,6 +67,84 @@
  DEPENDS ON:
   - phone_common_utils
      decimalToString
+
+ORIGINAL DOCUMENTATION:
+  General Attack Indexes - frame data correction
+
+  AG_MUNO_ATTACK_EXCLUDE
+    Set to 1 to exclude this move from the list of moves
+  AG_MUNO_ATTACK_NAME
+    Enter a string to override the move's name in the attack list
+  AG_MUNO_ATTACK_FAF
+    Enter a string to override FAF
+  AG_MUNO_ATTACK_ENDLAG
+    Enter a string to override endlag
+  AG_MUNO_ATTACK_LANDING_LAG
+    Enter a string to override landing lag
+  AG_MUNO_ATTACK_MISC
+    Enter a string to OVERRIDE the move's "Notes" section, which automatically
+    includes the Cooldown System and Misc. Window Traits found below
+  AG_MUNO_ATTACK_MISC_ADD
+    Enter a string to ADD TO the move's "Notes" section (preceded by the auto-
+    generated one, then a line break)
+
+  P.S. Adding Notes to a move is good for if a move requires a long explanation of
+    the data, or if a move overall has certain behavior that should be listed, such
+    as a manually coded cancel window.
+
+  General Window Indexes - frame data correction
+
+  AG_MUNO_WINDOW_EXCLUDE
+    0: include window in timeline (default)
+    1: exclude window from timeline
+    2: exclude window from timeline, only for the on-hit time
+    3: exclude window from timeline, only for the on-whiff time
+  AG_MUNO_WINDOW_ROLE
+    0: none (acts identically to AG_MUNO_WINDOW_EXCLUDE = 1)
+    1: startup
+    2: active (or IN BETWEEN active frames, eg between multihits)
+    3: endlag
+  AG_MUNO_ATTACK_USES_ROLES
+    Must be set to 1 for AG_MUNO_WINDOW_ROLE to take effect
+
+  P.S. If your move's windows are structured non-linearly, you can use
+    AG_MUNO_WINDOW_ROLE to force the frame data system to parse the window order
+    correctly (to a certain extent).
+
+  General Hitbox Indexes - frame data correction
+
+  HG_MUNO_HITBOX_EXCLUDE
+    Set to 1 to exclude this hitbox from the frame data guide
+  HG_MUNO_HITBOX_NAME
+    Enter a string to override the hitbox's name, very useful if the move has
+    multiple hitboxes
+
+  HG_MUNO_HITBOX_ACTIVE
+    Enter a string to override active frames
+  HG_MUNO_HITBOX_DAMAGE
+    Enter a string to override damage
+  HG_MUNO_HITBOX_BKB
+    Enter a string to override base knockback
+  HG_MUNO_HITBOX_KBG
+    Enter a string to override knockback growth
+  HG_MUNO_HITBOX_ANGLE
+    Enter a string to override angle
+  HG_MUNO_HITBOX_PRIORITY
+    Enter a string to override priority
+  HG_MUNO_HITBOX_GROUP
+    Enter a string to override group
+  HG_MUNO_HITBOX_BHP
+    Enter a string to override base hitpause
+  HG_MUNO_HITBOX_HPG
+    Enter a string to override hitpause scaling
+  HG_MUNO_HITBOX_MISC
+    Enter a string to override the auto-generated misc notes (which include misc
+    properties like angle flipper or elemental effect)
+  HG_MUNO_HITBOX_MISC_ADD
+    Enter a string to ADD TO the auto-generated misc notes, not override (line
+    break will be auto-inserted)
+
+  
 */
 //===========================================
 
