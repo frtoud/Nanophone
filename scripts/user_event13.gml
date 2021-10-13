@@ -1990,110 +1990,181 @@ array_push(phone.data, {
     name: phone.custom_name,
     type: 3 // custom
 });
+
 //=======================================================================================
 // 
 #define initMove(atk_index, default_move_name)
 
 var def = "-"; //default value, considered as string-equivalent to "null" for certain functions
-var n = 0;
 
 var stored_name = pullAttackValue(atk_index, AG_MUNO_ATTACK_NAME, default_move_name);
 
 var stored_timeline = [];
-if get_attack_value(atk_index, AG_MUNO_ATTACK_USES_ROLES) for (n = 0; get_window_value(atk_index, n+1, AG_WINDOW_LENGTH); n++){
-    if get_window_value(atk_index, n+1, AG_MUNO_WINDOW_ROLE) stored_timeline[array_length_1d(stored_timeline)] = n+1;
+if get_attack_value(atk_index, AG_MUNO_ATTACK_USES_ROLES)
+{
+    for (var n = 0; get_window_value(atk_index, n+1, AG_WINDOW_LENGTH); n++)
+    {
+        if get_window_value(atk_index, n+1, AG_MUNO_WINDOW_ROLE) 
+            stored_timeline[array_length(stored_timeline)] = n+1;
+    }
 }
-else if get_attack_value(atk_index, AG_NUM_WINDOWS) for (n = 0; n < get_attack_value(atk_index, AG_NUM_WINDOWS); n++){
-    if !(get_window_value(atk_index, n+1, AG_MUNO_WINDOW_EXCLUDE) == 1) stored_timeline[array_length_1d(stored_timeline)] = n+1;
+else if get_attack_value(atk_index, AG_NUM_WINDOWS) 
+{
+    for (var n = 0; n < get_attack_value(atk_index, AG_NUM_WINDOWS); n++)
+    {
+        if !(get_window_value(atk_index, n+1, AG_MUNO_WINDOW_EXCLUDE) == 1)
+            stored_timeline[array_length(stored_timeline)] = n+1;
+    }
 }
-else{
+else
+{
     stored_timeline = 0;
 }
 
 var stored_length = def;
-if is_array(stored_timeline){
+if is_array(stored_timeline)
+{
     stored_length = 0;
-    for (n = 0; n < array_length_1d(stored_timeline); n++){
-        if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 2) stored_length += get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH);
+    for (var n = 0; n < array_length(stored_timeline); n++)
+    {
+        if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 2) 
+            stored_length += get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH);
     }
     var stored_length_w = 0;
-    for (n = 0; n < array_length_1d(stored_timeline); n++){
-        if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 3) stored_length_w += ceil(get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH) * (get_window_value(atk_index, stored_timeline[n], AG_WINDOW_HAS_WHIFFLAG) ? 1.5 : 1));
+    for (var n = 0; n < array_length_1d(stored_timeline); n++)
+    {
+        if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 3) 
+            stored_length_w += ceil( get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH) 
+                                  * (get_window_value(atk_index, stored_timeline[n], AG_WINDOW_HAS_WHIFFLAG) ? 1.5 : 1) );
     }
-    stored_length = decimalToString(stored_length) + ((stored_length == stored_length_w) ? "" : " (" + decimalToString(stored_length_w) + ")");
+    //If there's no whifflag, don't include second number
+    stored_length = decimalToString(stored_length);
+    if (stored_length != stored_length_w) 
+        stored_length += " (" + decimalToString(stored_length_w) + ")";
 }
 stored_length = pullAttackValue(atk_index, AG_MUNO_ATTACK_FAF, stored_length);
 
 var stored_ending_lag = def;
-if (is_array(stored_timeline)){
+if (is_array(stored_timeline))
+{
     var time_int = 0;
     var time_int_whiff = 0;
-    if get_attack_value(atk_index, AG_MUNO_ATTACK_USES_ROLES){
-        for (n = 0; n < array_length_1d(stored_timeline); n++){
-            if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_ROLE) == 3){
-                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 2) time_int += get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH);
-                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 3) time_int_whiff += ceil(get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH) * (get_window_value(atk_index, stored_timeline[n], AG_WINDOW_HAS_WHIFFLAG) ? 1.5 : 1));
+    if get_attack_value(atk_index, AG_MUNO_ATTACK_USES_ROLES)
+    {
+        for (var n = 0; n < array_length_1d(stored_timeline); n++)
+        {
+            if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_ROLE) == 3)
+            {
+                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 2) 
+                    time_int += get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH);
+
+                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 3) 
+                    time_int_whiff += ceil( get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH) 
+                                         * (get_window_value(atk_index, stored_timeline[n], AG_WINDOW_HAS_WHIFFLAG) ? 1.5 : 1) );
             }
         }
     }
-    else{
-        for (n = 0; n < array_length_1d(stored_timeline); n++){
+    else
+    {
+        for (var n = 0; n < array_length_1d(stored_timeline); n++)
+        {
             var last_hitbox_frame = 0;
             var test_me = 0;
-            for (var hh = 0; get_hitbox_value(atk_index, hh, HG_HITBOX_TYPE); hh++){
-                if (get_hitbox_value(atk_index, hh, HG_WINDOW) == stored_timeline[n]){
-                    test_me = get_hitbox_value(atk_index, hh, HG_LIFETIME) + get_hitbox_value(atk_index, hh, HG_WINDOW_CREATION_FRAME);
+            for (var hh = 0; get_hitbox_value(atk_index, hh, HG_HITBOX_TYPE); hh++)
+            {
+                if (get_hitbox_value(atk_index, hh, HG_WINDOW) == stored_timeline[n])
+                {
+                    test_me = get_hitbox_value(atk_index, hh, HG_LIFETIME) 
+                            + get_hitbox_value(atk_index, hh, HG_WINDOW_CREATION_FRAME);
+
                     if get_hitbox_value(atk_index, hh, HG_HITBOX_TYPE) == 2 test_me = -1;
                     if abs(test_me) > last_hitbox_frame last_hitbox_frame = test_me;
                 }
             }
-            if last_hitbox_frame > 0{
-                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 2) time_int = get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH) - last_hitbox_frame;
-                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 3) time_int_whiff = ceil(get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH) * (get_window_value(atk_index, stored_timeline[n], AG_WINDOW_HAS_WHIFFLAG) ? 1.5 : 1) - last_hitbox_frame);
+            if (last_hitbox_frame > 0)
+            {
+                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 2) 
+                    time_int = get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH) - last_hitbox_frame;
+
+                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 3) 
+                    time_int_whiff = ceil( get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH) 
+                                        * (get_window_value(atk_index, stored_timeline[n], AG_WINDOW_HAS_WHIFFLAG) ? 1.5 : 1) - last_hitbox_frame);
             }
-            else if last_hitbox_frame == -1{ // projectile
-                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 2) time_int = get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH);
-                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 3) time_int_whiff = ceil(get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH) * (get_window_value(atk_index, stored_timeline[n], AG_WINDOW_HAS_WHIFFLAG) ? 1.5 : 1));
+            else if (last_hitbox_frame == -1) // projectile
+            {
+                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 2)
+                    time_int = get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH);
+
+                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 3)
+                    time_int_whiff = ceil( get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH) 
+                                        * (get_window_value(atk_index, stored_timeline[n], AG_WINDOW_HAS_WHIFFLAG) ? 1.5 : 1) );
             }
-            else{
-                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 2) time_int += get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH);
-                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 3) time_int_whiff += ceil(get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH) * (get_window_value(atk_index, stored_timeline[n], AG_WINDOW_HAS_WHIFFLAG) ? 1.5 : 1));
+            else
+            {
+                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 2) 
+                    time_int += get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH);
+
+                if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_EXCLUDE) != 3) 
+                    time_int_whiff += ceil( get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH) 
+                                         * (get_window_value(atk_index, stored_timeline[n], AG_WINDOW_HAS_WHIFFLAG) ? 1.5 : 1) );
             }
         }
     }
     
-    if time_int && decimalToString(time_int) != stored_length{
+    if (time_int) && (decimalToString(time_int) != stored_length)
+    {
+        //If there's no whifflag, don't include second number
         stored_ending_lag = decimalToString(time_int);
-        if time_int != time_int_whiff stored_ending_lag += " (" + decimalToString(time_int_whiff) + ")";
+        if (time_int != time_int_whiff) 
+        stored_ending_lag += " (" + decimalToString(time_int_whiff) + ")";
     }
 }
 stored_ending_lag = pullAttackValue(atk_index, AG_MUNO_ATTACK_ENDLAG, stored_ending_lag);
 
+//Landing Lag
 var stored_landing_lag = def;
-if (get_attack_value(atk_index, AG_HAS_LANDING_LAG) && get_attack_value(atk_index, AG_CATEGORY) == 1){
+if (get_attack_value(atk_index, AG_HAS_LANDING_LAG) 
+    && get_attack_value(atk_index, AG_CATEGORY) == 1)
+{
     stored_landing_lag = decimalToString(get_attack_value(atk_index, AG_LANDING_LAG));
-    if get_attack_value(atk_index, AG_LANDING_LAG) stored_landing_lag += " (" + decimalToString(ceil(get_attack_value(atk_index, AG_LANDING_LAG) * 1.5)) + ")";
+    if (get_attack_value(atk_index, AG_LANDING_LAG)) 
+        stored_landing_lag += " (" + decimalToString(ceil(get_attack_value(atk_index, AG_LANDING_LAG) * 1.5)) + ")";
 }
 stored_landing_lag = pullAttackValue(atk_index, AG_MUNO_ATTACK_LANDING_LAG, stored_landing_lag);
 
+//Miscellaneous information
 var stored_misc = def;
 
-if (get_attack_value(atk_index, AG_STRONG_CHARGE_WINDOW) != 0){
+// Misc: Charge frame
+if (get_attack_value(atk_index, AG_STRONG_CHARGE_WINDOW) != 0)
+{
     var found = false;
     var strong_charge_frame = 0;
-    for (var iter = 0; iter < array_length(stored_timeline) && !found; iter++){
-        strong_charge_frame += ceil(get_window_value(atk_index, stored_timeline[iter], AG_WINDOW_LENGTH) * (get_window_value(atk_index, stored_timeline[iter], AG_WINDOW_HAS_WHIFFLAG) ? 1.5 : 1));
-        if stored_timeline[iter] == get_attack_value(atk_index, AG_STRONG_CHARGE_WINDOW) found = true;
+    //iterate through timeline to add up frames
+    for (var n = 0; n < array_length(stored_timeline) && !found; n++)
+    {
+        strong_charge_frame += ceil( get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH) 
+                                  * (get_window_value(atk_index, stored_timeline[n], AG_WINDOW_HAS_WHIFFLAG) ? 1.5 : 1) );
+        if (stored_timeline[n] == get_attack_value(atk_index, AG_STRONG_CHARGE_WINDOW))
+        {
+            found = true; break;
+        }
     }
-    if found stored_misc = checkAndAdd(stored_misc, "Charge frame: " + decimalToString(strong_charge_frame));
+    if (found)
+    {
+        stored_misc = checkAndAdd(stored_misc, "Charge frame: " + decimalToString(strong_charge_frame));
+    }
 }
-    
+
+//Misc: Invulnerability type
+//[DEV FEATURE]
 if is_array(stored_timeline)
 {
     var total_frames = 0;
-    for (n = 0; n < array_length_1d(stored_timeline); n++)
+    for (var n = 0; n < array_length(stored_timeline); n++)
     {
-        var frames = string(total_frames + 1) + "-" + string(total_frames + get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH));
+        var frames = string(total_frames + 1) + "-" 
+                   + string(total_frames + get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH));
         switch (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_INVUL)){
             case -1:
                 stored_misc = checkAndAdd(stored_misc, "Invincible f" + frames);
@@ -2111,7 +2182,8 @@ if is_array(stored_timeline)
     }
 }
 
-//Cooldown
+//Misc: Cooldown
+//[DEV FEATURE]
 if (get_attack_value(atk_index, AG_MUNO_ATTACK_COOLDOWN) != 0)
 {
     stored_misc = checkAndAdd(stored_misc, "Cooldown: " 
@@ -2119,7 +2191,7 @@ if (get_attack_value(atk_index, AG_MUNO_ATTACK_COOLDOWN) != 0)
                   + ((get_attack_value(atk_index, AG_MUNO_ATTACK_COOLDOWN) > 0) ? "" : " until land/walljump/hit"));
 }
 
-//Misc Addition
+//Misc: Additional info
 if (get_attack_value(atk_index, AG_MUNO_ATTACK_MISC_ADD) != 0)
 { stored_misc = checkAndAdd(stored_misc, get_attack_value(atk_index, AG_MUNO_ATTACK_MISC_ADD)); }
 //Misc override
@@ -2145,7 +2217,7 @@ array_push(phone.data, current_move);
 //parse through all hitboxes of this attack and register them
 for (var hb = 1; get_hitbox_value(atk_index, hb, HG_HITBOX_TYPE); hb++)
 {
-    if !get_hitbox_value(atk_index, hb, HG_MUNO_HITBOX_EXCLUDE) 
+    if !get_hitbox_value(atk_index, hb, HG_MUNO_HITBOX_EXCLUDE)
     { initHitbox(current_move, hb); }
 }
 
