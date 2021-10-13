@@ -1877,7 +1877,10 @@ return -1;
 
 phone_stopped_sounds = [];
 
-if get_attack_value(attack, AG_MUNO_ATTACK_COOLDOWN) != 0 switch (get_attack_value(attack, AG_MUNO_ATTACK_CD_SPECIAL)){
+//Cooldown overrides
+if (get_attack_value(attack, AG_MUNO_ATTACK_COOLDOWN) != 0 )
+switch (get_attack_value(attack, AG_MUNO_ATTACK_CD_SPECIAL))
+{
     case 1:
         move_cooldown[attack] = phone_arrow_cooldown;
         break;
@@ -1886,6 +1889,7 @@ if get_attack_value(attack, AG_MUNO_ATTACK_COOLDOWN) != 0 switch (get_attack_val
         break;
 }
 
+// Trigger for Phone attack
 if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || (attack == AT_PHONE)
 {
     attack = AT_PHONE;
