@@ -3,7 +3,7 @@
  DESCRIPTION:
   Simple common functions used by Phone's backend
 
-STRUCTURES:
+ STRUCTURES:
   - NONE (by design)
 
  DEPENDS ON:
