@@ -462,18 +462,26 @@ VISUALS
   + Try removing direct dependency to "y"
  - phone.apps
   PAGE SYSTEM
+  - phone.apps[].array[].page_starts
   - phone.page
   - phone.page_change_timer
   - phone.page_change_timer_max
+  - phonePageChange()
   // sets item.page_starts on appropriate app items when running out of drawspace
-  
 
 GENERAL INTERFACE
+ Phone logic
+  - phone.app
+  - setPhoneApp()
+  - phoneAppIconSlide()
+  - normalListLogic()
  normalListLogic
   - held_timer
+  - phone.app
   - phone.apps[].array
   - phone.cursor
   - phone.scroll_dist
+  - phoneCursorChange()
   Scrolling
    - phone.target_scroll_dist
    - phone.screen_width

@@ -112,12 +112,15 @@ phone = {
     uses_shader: 0,
     supports_fast_graphics: false, // Set to true to activate fast graphics checks
     dont_fast: false, //set to true to prevent low fps checks
+    
+    //Frame data config
     include_stats: true,
     stats_notes: "-",
     include_custom: false,
     custom_name: "",
     custom_fd_content: [],
-    extra_top_size: 0,
+
+    extra_top_size: 0, //if phone casing is too large, prevents hint text from overlapping
     
     // "constants"
     lowered_y: 300,
@@ -1710,15 +1713,16 @@ phone.page_change_timer = phone.page_change_timer_max;
     phone.state_timer = 0;
 }
 //=============================================================================
+// handles phone's input logic
 // Returns current cursor selection index (or -1 if no selection can be made)
 #define normalListLogic(ignore_0th)
 
 var arr = phone.apps[phone.app].array;
-var len = array_length_1d(arr);
+var len = array_length(arr);
 
 if (len == 0) return -1; //No items on this app
 
-var pages_valid = false;
+var pages_valid = false; //if there are multiple pages to show on the current selection
 
 //joystick: moving cursor around list
 if (!joy_pad_idle && "held_timer" in self) && (array_length(arr) > 1)
@@ -1754,12 +1758,13 @@ if ("page_starts" in arr[phone.cursor] && array_length(arr[phone.cursor].page_st
 {
     pages_valid = true;
     var pgs = array_length(arr[phone.cursor].page_starts);
-    if attack_pressed{
+    if (attack_pressed)
+    {
         phone.page++;
         phoneCursorChange();
-        clear_button_buffer(PC_ATTACK_PRESSED);
         phonePageChange();
         sound_play(sfx_pho_page, false, 0);
+        clear_button_buffer(PC_ATTACK_PRESSED);
     }
     phone.page = (phone.page + pgs) % pgs;
 }
@@ -1844,9 +1849,12 @@ return -1;
 
 #define CORE_set_attack
 
+//reset sound tracker array
+//[DEV FEATURE]
 phone_stopped_sounds = [];
 
 //Cooldown overrides
+//[DEV FEATURE]
 if (get_attack_value(attack, AG_MUNO_ATTACK_COOLDOWN) != 0 )
 switch (get_attack_value(attack, AG_MUNO_ATTACK_CD_SPECIAL))
 {
