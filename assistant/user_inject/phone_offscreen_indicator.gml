@@ -4,8 +4,17 @@
   Renders offsceen indicators for tracked objects.
 
  STRUCTURES:
+  - OFFSCREENOBJtype
+     x: real
+     y: real
+     phone_offscr_leeway: real
+     phone_offscr_x_offset: real
+     phone_offscr_y_offset: real
+     phone_offscr_sprite: sprite
+     phone_offscr_index: real
 
  DEPENDS ON:
+  - phone_offscreen: [OFFSCREENOBJtype]
   - Sprites:
    - "_pho_offscreen_strip8.png"
 
@@ -45,8 +54,6 @@ if !array_equals(phone_offscreen, [])
                 var off_u = y_ < view_get_yview() - leeway;
                 var off_d = y_ > view_get_yview() + view_get_hview() - 52 + leeway;
 
-                var margin = 34;
-
                 //Check which direction offscreen bubble points towards  
                 var idx = noone;
                 if (off_l)
@@ -66,6 +73,7 @@ if !array_equals(phone_offscreen, [])
 
                 if (idx != noone)
                 {
+                    var margin = 34;
                     draw_sprite_ext(spr_pho_offscreen, idx, 
                                     clamp(x_ - view_get_xview(), margin, view_get_wview() - margin) - 32, 
                                     clamp(y_ - view_get_yview(), margin, view_get_hview() - 52 - margin) - 32, 
@@ -81,6 +89,6 @@ if !array_equals(phone_offscreen, [])
             }
         }
     }
-
+    //Clear array if no element left to track (optimizes check above)
     if (array_empty) phone_offscreen = [];
 }

@@ -631,7 +631,6 @@ if (use_alt_names) && (alt_cur < array_length(alt_names)) && (alt_names[alt_cur]
 
 #define CORE_draw_hud
 
-//Offscreen indicators
 offscreen_indicators_draw();
 
 // FPS notification
@@ -2494,8 +2493,6 @@ return newdust;
                     var off_u = y_ < view_get_yview() - leeway;
                     var off_d = y_ > view_get_yview() + view_get_hview() - 52 + leeway;
 
-                    var margin = 34;
-
                     //Check which direction offscreen bubble points towards
                     var idx = noone;
                     if (off_l)
@@ -2515,6 +2512,7 @@ return newdust;
 
                     if (idx != noone)
                     {
+                        var margin = 34;
                         draw_sprite_ext(spr_pho_offscreen, idx,
                                         clamp(x_ - view_get_xview(), margin, view_get_wview() - margin) - 32,
                                         clamp(y_ - view_get_yview(), margin, view_get_hview() - 52 - margin) - 32,
@@ -2530,7 +2528,7 @@ return newdust;
                 }
             }
         }
-
+        //Clear array if no element left to track (optimizes check above)
         if (array_empty) phone_offscreen = [];
     }
 // DANGER: Write your code ABOVE the LIBRARY DEFINES AND MACROS header or it will be overwritten!
