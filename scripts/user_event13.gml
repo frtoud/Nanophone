@@ -1876,8 +1876,9 @@ if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || (attack == AT_PHONE
 
 
 //========================================================================================================
-// Registers every move data into the Data app's array
 #define loadFrameData
+// Initializes Data app's pages
+//========================================================================================================
 
 i = 0; // i = current spot in the registered move list
 
@@ -1895,19 +1896,6 @@ for (j = 0; j < array_length_1d(phone.move_ordering); j++)  // j = index in arra
     }
 }
 
-//=======================================================================================
-// reserves spots for special stat pages
-#define initStats
-array_push(phone.data, {
-    name: "Stats",
-    type: 1 // stats
-});
-#define initCustom
-array_push(phone.data, {
-    name: phone.custom_name,
-    type: 3 // custom
-});
-
 #define spawn_base_dust // originally by supersonic
 /// spawn_base_dust(x, y, name, dir = 0)
 ///spawn_base_dust(x, y, name, ?dir)
@@ -1920,7 +1908,8 @@ var dust_color = 0;
 var x = argument[0], y = argument[1], name = argument[2];
 var dir = argument_count > 3 ? argument[3] : 0;
 
-switch (name) {
+switch (name) 
+{
     default: 
     case "dash_start":dlen = 21; dfx = 3; dfg = 2626; break;
     case "dash": dlen = 16; dfx = 4; dfg = 2656; break;
@@ -2017,6 +2006,26 @@ return newdust;
         gpu_set_blendmode(bm_normal);
         draw_set_alpha(1);
     }
+
+#define initStats // Version 0
+    // Reserves a page for general character stats
+    // =======================================================================================
+    array_push(phone.data, {
+        name: "Stats",
+        type: 1 // stats
+    });
+
+    //=======================================================================================
+
+#define initCustom // Version 0
+    // Reserves a page for special character stats
+    // =======================================================================================
+    array_push(phone.data, {
+        name: phone.custom_name,
+        type: 3 // custom
+    });
+
+    //=======================================================================================
 
 #define initMove(atk_index, default_move_name) // Version 0
     // Parses Attack grid data and assembles a data page for one move.

@@ -150,6 +150,23 @@ ORIGINAL DOCUMENTATION:
 */
 //===========================================
 
+//=======================================================================================
+#define initStats
+// Reserves a page for general character stats
+//=======================================================================================
+array_push(phone.data, {
+    name: "Stats",
+    type: 1 // stats
+});
+
+//=======================================================================================
+#define initCustom
+// Reserves a page for special character stats
+//=======================================================================================
+array_push(phone.data, {
+    name: phone.custom_name,
+    type: 3 // custom
+});
 
 //=======================================================================================
 #define initMove(atk_index, default_move_name)
