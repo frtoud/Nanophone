@@ -1935,7 +1935,7 @@ else if get_attack_value(atk_index, AG_NUM_WINDOWS)
 }
 else
 {
-    stored_timeline = 0;
+    stored_timeline = noone;
 }
 
 var stored_length = def;
@@ -1968,7 +1968,7 @@ if (is_array(stored_timeline))
     var time_int_whiff = 0;
     if get_attack_value(atk_index, AG_MUNO_ATTACK_USES_ROLES)
     {
-        for (var n = 0; n < array_length_1d(stored_timeline); n++)
+        for (var n = 0; n < array_length(stored_timeline); n++)
         {
             if (get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_ROLE) == 3)
             {
@@ -1983,7 +1983,7 @@ if (is_array(stored_timeline))
     }
     else
     {
-        for (var n = 0; n < array_length_1d(stored_timeline); n++)
+        for (var n = 0; n < array_length(stored_timeline); n++)
         {
             var last_hitbox_frame = 0;
             var test_me = 0;
@@ -2092,7 +2092,8 @@ if is_array(stored_timeline)
             case 0:
                 break;
             default:
-                stored_misc = checkAndAdd(stored_misc, string(get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_INVUL)) + " Soft Armor f" + frames);
+                var soft_armor = get_window_value(atk_index, stored_timeline[n], AG_MUNO_WINDOW_INVUL);
+                stored_misc = checkAndAdd(stored_misc, string(soft_armor) + " Soft Armor f" + frames);
                 break;
         }
         total_frames += get_window_value(atk_index, stored_timeline[n], AG_WINDOW_LENGTH);
