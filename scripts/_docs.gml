@@ -414,7 +414,7 @@ USER FEATURES
  Cheats page
   + Rename to "Extras"
   + Add Rune control
-
+  + Add Jukebox
 
  UTILITIES
   - phone.utils_cur
@@ -627,3 +627,5 @@ CUSTOMFDtype
  type: int -> 0,1
  content: string
 */
+
+//NO-INJECT
