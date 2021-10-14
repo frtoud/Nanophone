@@ -551,6 +551,8 @@ NOTES
  + Block of frame data Misc uses function that checks for parent when there is none as per condition
  + Frame data load inneficiency: overrides checked AFTER algorithm tries to determine grid value 
  + Frame data load Angle and Final_Knockback use get_hitbox_value directly; why? possible bugs?
+ + Additional indexes mix user features and dev features
+ + The AG_ indexes mix attack indexes and window indexes
  */
 
 /*
