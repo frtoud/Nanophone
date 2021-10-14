@@ -1912,7 +1912,7 @@ return newdust;
 
 //================================================================================
 
-// vvv LIBRARY DEFINES AND MACROS vvv
+// #region vvv LIBRARY DEFINES AND MACROS vvv
 // DANGER File below this point will be overwritten! Generated defines and macros below.
 // Write NO-INJECT in a comment above this area to disable injection.
 #define detect_online // Version 0
@@ -1924,8 +1924,6 @@ return newdust;
             return true;
     }
     return false;
-
-    //================================================================================
 
 #define decimalToString(input) // Version 0
     // returns input as a string value, up to two decimal places.
@@ -1950,8 +1948,6 @@ return newdust;
 
     return input;
 
-    //================================================================================
-
 #define maskHeader // Version 0
     // Mask renderer utility: disables Normal draw.
     // Draw shapes or sprites to be used as the stencil(s) by maskMidder.
@@ -1963,7 +1959,6 @@ return newdust;
         draw_rectangle_color(0,0, room_width, room_height, c_white, c_white, c_white, c_white, false);
         draw_set_alpha(1);
     }
-    //================================================================================
 
 #define maskMidder // Version 0
     // Reenables draw but only within the region drawn between maskHeader and maskMidder.
@@ -1975,7 +1970,6 @@ return newdust;
         gpu_set_blendmode_ext(bm_dest_alpha,bm_inv_dest_alpha);
         gpu_set_alphatestenable(true);
     }
-    //================================================================================
 
 #define maskFooter // Version 0
     // Restores normal drawing parameters
@@ -2005,8 +1999,6 @@ return newdust;
         }
     }
 
-    //=======================================================================================
-
 #define initStats // Version 0
     // Reserves a page for general character stats
     // =======================================================================================
@@ -2015,8 +2007,6 @@ return newdust;
         type: 1 // stats
     });
 
-    //=======================================================================================
-
 #define initCustom // Version 0
     // Reserves a page for special character stats
     // =======================================================================================
@@ -2024,8 +2014,6 @@ return newdust;
         name: phone.custom_name,
         type: 3 // custom
     });
-
-    //=======================================================================================
 
 #define initMove(atk_index, default_move_name) // Version 0
     // Parses Attack grid data and assembles a data page for one move.
@@ -2258,8 +2246,6 @@ return newdust;
         { initHitbox(current_move, hb); }
     }
 
-    //================================================================================
-
 #define initHitbox(move, index) // Version 0
     // Parses attack grid data and assembles the description for one hitbox.
     // inserted directly in move.hitboxes.
@@ -2430,9 +2416,6 @@ return newdust;
         parent_hbox: parent
     });
 
-
-    //================================================================================
-
 #define pullHitboxValue(atk_index, hbox, index, def) // Version 0
     // returns atk_index's hbox's data value of index (converted to string as necessary).
     // if it is zero, returns def instead. considers HG_PARENT_HITBOX inheritance.
@@ -2457,9 +2440,6 @@ return newdust;
     //convert to string
     if (value != 0) || is_string(value) return decimalToString(value);
     else return string(def);
-
-
-    //================================================================================
 
 #define checkAndAdd(orig, add) // Version 0
     // concatenates strings using separators.
@@ -2488,9 +2468,6 @@ return newdust;
     // ================================================================================
     var value = get_attack_value(atk_index, index);
     return is_string(value) ? value : def;
-
-
-    //================================================================================
 
 #define offscreen_indicators_draw // Version 0
     // USED IN: HUD draw event
@@ -2560,3 +2537,4 @@ return newdust;
         if (array_empty) phone_offscreen = [];
     }
 // DANGER: Write your code ABOVE the LIBRARY DEFINES AND MACROS header or it will be overwritten!
+// #endregion
