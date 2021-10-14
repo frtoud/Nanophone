@@ -183,6 +183,7 @@ sfx_pho_power_off = sound_get("_pho_acnh_chime3");
 sfx_pho_power_on = sound_get("_pho_acnh_chime1");
 
 initIndexes();
+initCodecIndexes();
 
 
 phone.attack_names = [
@@ -453,10 +454,9 @@ return array_length(utils) - 1;
 #define initIndexes
 
 // Custom indexes
-
 AT_PHONE = phone.phone_attack_index;
 
-i = phone.starting_ag_index;
+var i = phone.starting_ag_index;
 
 // NOTE: All overrides for the frame data guide should be strings. Any non-applicable (N/A) values should be entered as "-"
 
@@ -497,30 +497,32 @@ AG_MUNO_WINDOW_INVUL = i; i++;          // -1: invulnerable    -2: super armor  
  * - 4: a window will set cooldown only if the has_hit_player variable is false, and set it to 0 if has_hit_player is true.
  */
 
-i = phone.starting_hg_index;
+var h = phone.starting_hg_index;
 
-HG_MUNO_HITBOX_EXCLUDE = i; i++;        // Set to 1 to exclude this hitbox from the frame data guide
-HG_MUNO_HITBOX_NAME = i; i++;           // Enter a string to override hitbox name
+HG_MUNO_HITBOX_EXCLUDE = h; h++;        // Set to 1 to exclude this hitbox from the frame data guide
+HG_MUNO_HITBOX_NAME = h; h++;           // Enter a string to override hitbox name
 
-HG_MUNO_HITBOX_ACTIVE = i; i++;         // Enter a string to override active frames
-HG_MUNO_HITBOX_DAMAGE = i; i++;         // Enter a string to override damage
-HG_MUNO_HITBOX_BKB = i; i++;            // Enter a string to override base knockback
-HG_MUNO_HITBOX_KBG = i; i++;            // Enter a string to override knockback growth
-HG_MUNO_HITBOX_ANGLE = i; i++;          // Enter a string to override angle
-HG_MUNO_HITBOX_PRIORITY = i; i++;       // Enter a string to override priority
-HG_MUNO_HITBOX_GROUP = i; i++;          // Enter a string to override group
-HG_MUNO_HITBOX_BHP = i; i++;            // Enter a string to override base hitpause
-HG_MUNO_HITBOX_HPG = i; i++;            // Enter a string to override hitpause scaling
-HG_MUNO_HITBOX_MISC = i; i++;           // Enter a string to override the auto-generated misc notes (which include misc properties like angle flipper or elemental effect)
-HG_MUNO_HITBOX_MISC_ADD = i; i++;       // Enter a string to ADD TO the auto-generated misc notes, not override (line break will be auto-inserted)
+HG_MUNO_HITBOX_ACTIVE = h; h++;         // Enter a string to override active frames
+HG_MUNO_HITBOX_DAMAGE = h; h++;         // Enter a string to override damage
+HG_MUNO_HITBOX_BKB = h; h++;            // Enter a string to override base knockback
+HG_MUNO_HITBOX_KBG = h; h++;            // Enter a string to override knockback growth
+HG_MUNO_HITBOX_ANGLE = h; h++;          // Enter a string to override angle
+HG_MUNO_HITBOX_PRIORITY = h; h++;       // Enter a string to override priority
+HG_MUNO_HITBOX_GROUP = h; h++;          // Enter a string to override group
+HG_MUNO_HITBOX_BHP = h; h++;            // Enter a string to override base hitpause
+HG_MUNO_HITBOX_HPG = h; h++;            // Enter a string to override hitpause scaling
+HG_MUNO_HITBOX_MISC = h; h++;           // Enter a string to override the auto-generated misc notes (which include misc properties like angle flipper or elemental effect)
+HG_MUNO_HITBOX_MISC_ADD = h; h++;       // Enter a string to ADD TO the auto-generated misc notes, not override (line break will be auto-inserted)
 
 // Misc. Hitbox Traits
-HG_MUNO_OBJECT_LAUNCH_ANGLE = i; i++;   // Override the on-hit launch direction of compatible Workshop objects, typically ones without gravity. For example, Otto uses this for the ball rehit angles. Feel free to code this into your attacks, AND to support it for your own hittable articles.
+HG_MUNO_OBJECT_LAUNCH_ANGLE = h; h++;   // Override the on-hit launch direction of compatible Workshop objects, typically ones without gravity. For example, Otto uses this for the ball rehit angles. Feel free to code this into your attacks, AND to support it for your own hittable articles.
 
 /* Set the obj launch angle to:
  * - -1 to send horizontally away (simulates flipper 3, angle 0)
  * - -2 to send radially away (simulates flipper 8)
  */
+
+#define initCodecIndexes
 
 // Codec speakers
 SPK_TRUM = 0;
