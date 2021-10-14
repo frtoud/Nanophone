@@ -246,7 +246,7 @@ phone.attack_names = [
 with (phone)
 {
     phone = self; //redundancy to avoid ambiguity in function calls?
-    
+
     APP_HOME        = pho_initApp("Home Screen",    $000000, $000000, apps);
     APP_TIPS        = pho_initApp("Tips",           $1e82f2, $002eaf, tips);
     APP_PATCHES     = pho_initApp("Patches",        $15f37e, $007852, patches);
@@ -420,7 +420,7 @@ array_push(phone.currently_edited_obj.objs, {
 
 //=========================================================================
 // Creates a new App and returns the App's index in the apps array.
-#define pho_initApp(app_name, app_color, app_color_dark, arr)
+#define pho_initApp(app_name, app_color, app_color_dark, app_content)
 {
     array_push(apps, {
         name: app_name,
@@ -430,7 +430,7 @@ array_push(phone.currently_edited_obj.objs, {
         color_dark: make_color_rgb(color_get_blue(app_color_dark), 
                                    color_get_green(app_color_dark), 
                                    color_get_red(app_color_dark)),
-        array: arr
+        array: app_content
     });
 
     return array_length(apps) - 1;
@@ -1647,6 +1647,21 @@ phone.page_change_timer = phone.page_change_timer_max;
 // handles phone's input logic
 // Returns current cursor selection index (or -1 if no selection can be made)
 #define normalListLogic(ignore_0th)
+//dependencies:
+// phone.apps[].array
+// phone.app
+// phone.cursor
+// held_timer
+//Cosmetic
+// phoneCursorChange()
+// phonePageChange()
+// sfx_pho_move
+// sfx_pho_move_home
+// sfx_pho_page
+//Page subsystem
+// phone.page
+// phone.apps[].array[].page_starts
+// phone.apps[].array[].options
 
 var arr = phone.apps[phone.app].array;
 var len = array_length(arr);
@@ -1711,17 +1726,19 @@ if ("options" in arr[phone.cursor])
     if (cursor_change != 0)
     {
         arr[phone.cursor].on += cursor_change;
-        if utiling phone.utils_cur_updated[phone.cursor] = 1;
-        if cheating phone_cheats_updated[phone.cursor] = 1;
-        phoneCursorChange();
+        if (utiling) phone.utils_cur_updated[phone.cursor] = 1;
+        else if (cheating) phone_cheats_updated[phone.cursor] = 1;
         clear_button_buffer(PC_ATTACK_PRESSED);
         clear_button_buffer(PC_JUMP_PRESSED);
+        phoneCursorChange();
         phonePageChange();
         sound_play(sfx_pho_page, false, 0);
     }
     arr[phone.cursor].on = (arr[phone.cursor].on + opts) % opts;
-    if utiling phone.utils_cur[phone.cursor] = arr[phone.cursor].options[arr[phone.cursor].on];
-    if cheating phone_cheats[phone.cursor] = arr[phone.cursor].options[arr[phone.cursor].on];
+    if (utiling) 
+        phone.utils_cur[phone.cursor] = arr[phone.cursor].options[arr[phone.cursor].on];
+    else if (cheating) 
+        phone_cheats[phone.cursor] = arr[phone.cursor].options[arr[phone.cursor].on];
 }
 
 //Scrolling (except for HOME)
