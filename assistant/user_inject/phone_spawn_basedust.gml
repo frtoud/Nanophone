@@ -11,10 +11,13 @@
      [3] "direction": real
 
  DEPENDS ON:
-  - phone_offscreen: [DUSTQUERYtype]
+  - phone_dust_query: [DUSTQUERYtype]
 
  USED IN:
   - UPDATE event
+
+ INPUTS:
+  - phone_dust_query: [DUSTQUERYtype] (fill with entires to spawn dusts)
 
 ORIGINAL DOCUMENTATION:
   phone_dust_query
@@ -44,7 +47,25 @@ ORIGINAL DOCUMENTATION:
 //===========================================
 
 //========================================================================================================
-#define spawn_base_dust 
+#define process_dust_queries
+//processes all requests within phone_dust_query, spawning their vfx.
+//========================================================================================================
+if (array_length(phone_dust_query) > 0)
+{
+    for(var i = 0; i < array_length(phone_dust_query); i++)
+    {
+        var cur = phone_dust_query[i];
+        //implied X, Y, dust type, and spr_dir parameters
+        spawn_base_dust(cur[0], cur[1], cur[2], cur[3]);
+    }
+
+    //clearing array
+    phone_dust_query = [];
+}
+
+
+//========================================================================================================
+#define spawn_base_dust
 ///spawn_base_dust(x, y, name, dir = 0)
 ///spawn_base_dust(x, y, name, ?dir)
 // originally by supersonic

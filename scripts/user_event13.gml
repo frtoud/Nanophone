@@ -1336,15 +1336,7 @@ if (!phone.lightweight)
     }
 
     //Spawn basegame dust fx
-    if array_length(phone_dust_query)
-    {
-        for(var i = 0; i < array_length(phone_dust_query); i++)
-        {
-            var cur = phone_dust_query[i];
-            spawn_base_dust(cur[0], cur[1], cur[2], cur[3]);
-        }
-        phone_dust_query = [];
-    }
+    process_dust_queries();
 } // END LIGHTWEIGHT
 
 //=============================================================================
@@ -2517,6 +2509,22 @@ if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || (attack == AT_PHONE
         }
         //Clear array if no element left to track (optimizes check above)
         if (array_empty) phone_offscreen = [];
+    }
+
+#define process_dust_queries // Version 0
+    // processes all requests within phone_dust_query, spawning their vfx.
+    // ========================================================================================================
+    if (array_length(phone_dust_query) > 0)
+    {
+        for(var i = 0; i < array_length(phone_dust_query); i++)
+        {
+            var cur = phone_dust_query[i];
+            //implied X, Y, dust type, and spr_dir parameters
+            spawn_base_dust(cur[0], cur[1], cur[2], cur[3]);
+        }
+
+        //clearing array
+        phone_dust_query = [];
     }
 
 #define spawn_base_dust // Version 0
