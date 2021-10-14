@@ -1,7 +1,7 @@
 //===========================================
 /*
  DESCRIPTION:
-  Renders offsceen indicators for tracked objects.
+  Spawns basegame's dust vfx from specific events.
 
  STRUCTURES:
   - DUSTQUERYtype: []
