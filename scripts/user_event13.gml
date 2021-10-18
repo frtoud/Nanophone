@@ -1694,6 +1694,7 @@ if ("options" in arr[phone.cursor])
 }
 
 //Scrolling (except for HOME)
+//Independent from any inputs of this function!
 if (phone.app > 0)
 {
     phone.target_scroll_dist = 0;

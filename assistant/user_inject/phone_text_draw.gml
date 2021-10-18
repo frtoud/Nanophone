@@ -8,7 +8,7 @@
      width: real
      height: real
 
- DEPENDS ON:
+ OUTPUT:
   - phone.last_text_size: SIZEtype (size of last text drawn)
 */
 //===========================================

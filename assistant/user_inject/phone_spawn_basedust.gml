@@ -10,8 +10,6 @@
      [2] "dust type": string
      [3] "direction": real
 
- DEPENDS ON:
-
  USED IN:
   - INIT event
   - UPDATE event
