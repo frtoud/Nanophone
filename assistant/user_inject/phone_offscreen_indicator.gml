@@ -14,12 +14,15 @@
      phone_offscr_index: real
 
  DEPENDS ON:
-  - phone_offscreen: [OFFSCREENOBJtype]
   - Sprites:
    - "_pho_offscreen_strip8.png"
 
  USED IN:
+  - INIT event
   - HUD draw event
+
+ INPUTS:
+  - phone_offscreen: [OFFSCREENOBJtype]
 
 ORIGINAL DOCUMENTATION:
   phone_offscreen
@@ -44,6 +47,12 @@ ORIGINAL DOCUMENTATION:
 */
 //===========================================
 
+//================================================================================
+#define offscreen_indicators_init()
+// USED IN: INIT event
+// creates the phone_offscreen array.
+//================================================================================
+phone_offscreen = []; //list of objects to track in offscreen indicators
 
 //================================================================================
 #define offscreen_indicators_draw()

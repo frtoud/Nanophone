@@ -66,8 +66,8 @@ phone_landing = 0;       // tracks "once per airtime" condition (getting hit, wa
 phone_lightweight = 0;
 
 //Request arrays
-phone_offscreen = []; //list of objects to track in offscreen indicators
-phone_dust_query = []; //list of requests for spawn_base_dust()
+offscreen_indicators_init();
+dust_query_init();
 
 // attack info
 phone_invul_override = 0;
@@ -96,6 +96,7 @@ phone_online = detect_online(); //TRUE if in an online match
 // phone info
 phone_fast = 0; //Fast graphics setting shortcut
 phone_char_ided = false; // lightweight only
+
 phone_cheats = [];
 phone_cheats_updated = []; // "just got clicked"; manually reset to 0
 phone_frozen_damage = 0;
@@ -594,6 +595,7 @@ if (phone.state == 0) return;
 var phone_x = 80 + phone.x;
 var phone_y = 264 + phone.y - sin(phone.click_bump_timer / 6) * 8;
 
+//Mask & background
 maskHeader();
 rectDraw(phone_x, phone_y, phone.screen_width, phone.screen_height, phone.apps[phone.app].color_dark);
 maskMidder();
@@ -2443,6 +2445,12 @@ if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || (attack == AT_PHONE
     var value = get_attack_value(atk_index, index);
     return is_string(value) ? value : def;
 
+#define offscreen_indicators_init // Version 0
+    // USED IN: INIT event
+    // creates the phone_offscreen array.
+    // ================================================================================
+    phone_offscreen = []; //list of objects to track in offscreen indicators
+
 #define offscreen_indicators_draw // Version 0
     // USED IN: HUD draw event
     // Draws offscreen indicators for objects in phone_offscreen.
@@ -2511,21 +2519,11 @@ if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || (attack == AT_PHONE
         if (array_empty) phone_offscreen = [];
     }
 
-#define process_dust_queries // Version 0
-    // processes all requests within phone_dust_query, spawning their vfx.
-    // ========================================================================================================
-    if (array_length(phone_dust_query) > 0)
-    {
-        for(var i = 0; i < array_length(phone_dust_query); i++)
-        {
-            var cur = phone_dust_query[i];
-            //implied X, Y, dust type, and spr_dir parameters
-            spawn_base_dust(cur[0], cur[1], cur[2], cur[3]);
-        }
-
-        //clearing array
-        phone_dust_query = [];
-    }
+#define dust_query_init // Version 0
+    // USED IN: INIT event
+    // creates the phone_dust_query array.
+    // ================================================================================
+    phone_dust_query = []; //list of requests for spawn_base_dust()
 
 #define spawn_base_dust // Version 0
     // /spawn_base_dust(x, y, name, dir = 0)
@@ -2568,5 +2566,21 @@ if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || (attack == AT_PHONE
     if (dfg != -1) newdust.fg_sprite = dfg; //set the foreground sprite
     if (dir != 0) newdust.spr_dir = dir; //set the spr_dir
     return newdust;
+
+#define process_dust_queries // Version 0
+    // processes all requests within phone_dust_query, spawning their vfx.
+    // ========================================================================================================
+    if (array_length(phone_dust_query) > 0)
+    {
+        for(var i = 0; i < array_length(phone_dust_query); i++)
+        {
+            var cur = phone_dust_query[i];
+            //implied X, Y, dust type, and spr_dir parameters
+            spawn_base_dust(cur[0], cur[1], cur[2], cur[3]);
+        }
+
+        //clearing array
+        phone_dust_query = [];
+    }
 // DANGER: Write your code ABOVE the LIBRARY DEFINES AND MACROS header or it will be overwritten!
 // #endregion

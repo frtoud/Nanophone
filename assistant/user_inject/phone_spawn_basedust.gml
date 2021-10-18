@@ -11,9 +11,9 @@
      [3] "direction": real
 
  DEPENDS ON:
-  - phone_dust_query: [DUSTQUERYtype]
 
  USED IN:
+  - INIT event
   - UPDATE event
 
  INPUTS:
@@ -46,9 +46,18 @@ ORIGINAL DOCUMENTATION:
 */
 //===========================================
 
+
+//================================================================================
+#define dust_query_init()
+// USED IN: INIT event
+// creates the phone_dust_query array.
+//================================================================================
+phone_dust_query = []; //list of requests for spawn_base_dust()
+
 //========================================================================================================
 #define process_dust_queries
-//processes all requests within phone_dust_query, spawning their vfx.
+// USED IN: UPDATE event
+// processes all requests within phone_dust_query, spawning their vfx.
 //========================================================================================================
 if (array_length(phone_dust_query) > 0)
 {
@@ -62,7 +71,6 @@ if (array_length(phone_dust_query) > 0)
     //clearing array
     phone_dust_query = [];
 }
-
 
 //========================================================================================================
 #define spawn_base_dust
