@@ -684,43 +684,6 @@ textDraw(app_x + 10, app_y + 13, "fName", (app_sel ? c_white : phone.apps[i].col
 
 
 //=====================================================================
-// Draw text at position x1, y1, using scale, alpha, align, font and color.
-// line_sep is the vertical separation between text.
-// line_max is the maximum length for a line of text.
-// if outlined is TRUE, draws a 2px black contour.
-// if get_size is TRUE, outputs the size of the written string to 
-// phone.last_text_size.width and phone.last_test_size.height
-#define textDraw(x1, y1, font, color, line_sep, line_max, align, scale, outlined, alpha, text, get_size)
-{
-    x1 = round(x1);
-    y1 = round(y1);
-
-    draw_set_font(asset_get(font));
-    draw_set_halign(align);
-
-    if (outlined)
-    {
-        for (var i = -1; i < 2; i++) 
-        {
-            for (var j = -1; j < 2; j++) 
-            {
-                draw_text_ext_transformed_color(x1 + i * 2, y1 + j * 2, text, 
-                    line_sep, line_max, scale, scale, 0, c_black, c_black, c_black, c_black, alpha);
-            }
-        }
-    }
-
-    if (alpha > 0.01) 
-        draw_text_ext_transformed_color(x1, y1, text, line_sep, line_max, 
-                    scale, scale, 0, color, color, color, color, alpha);
-
-    if (get_size)
-    {
-        phone.last_text_size.width = string_width_ext(text, line_sep, line_max); 
-        phone.last_text_size.height = string_height_ext(text, line_sep, line_max);
-    }
-}
-//=====================================================================
 
 /*
 ╔═══════════════════════════════════════════════════════════════════════════╗
@@ -2582,6 +2545,44 @@ if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || (attack == AT_PHONE
 
         //clearing array
         phone_dust_query = [];
+    }
+
+#define textDraw(x1, y1, font, color, line_sep, line_max, align, scale, outlined, alpha, text, get_size) // Version 0
+    // Draw text at position x1, y1, using scale, alpha, align, font and color.
+    // line_sep is the vertical separation between text.
+    // line_max is the maximum length for a line of text.
+    // if outlined is TRUE, draws a 2px black contour.
+    // if get_size is TRUE, outputs the size of the written string to
+    // phone.last_text_size.width and phone.last_test_size.height
+    // =====================================================================
+    {
+        x1 = round(x1);
+        y1 = round(y1);
+
+        draw_set_font(asset_get(font));
+        draw_set_halign(align);
+
+        if (outlined)
+        {
+            for (var i = -1; i < 2; i++)
+            {
+                for (var j = -1; j < 2; j++)
+                {
+                    draw_text_ext_transformed_color(x1 + i * 2, y1 + j * 2, text,
+                        line_sep, line_max, scale, scale, 0, c_black, c_black, c_black, c_black, alpha);
+                }
+            }
+        }
+
+        if (alpha > 0.01)
+            draw_text_ext_transformed_color(x1, y1, text, line_sep, line_max,
+                        scale, scale, 0, color, color, color, color, alpha);
+
+        if (get_size)
+        {
+            phone.last_text_size.width = string_width_ext(text, line_sep, line_max);
+            phone.last_text_size.height = string_height_ext(text, line_sep, line_max);
+        }
     }
 // DANGER: Write your code ABOVE the LIBRARY DEFINES AND MACROS header or it will be overwritten!
 // #endregion
