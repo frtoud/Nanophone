@@ -684,11 +684,6 @@ textDraw(app_x + 10, app_y + 13, "fName", (app_sel ? c_white : phone.apps[i].col
 
 
 //=====================================================================
-// Draws a colored rectangle (width and height effective size -1)
-#define rectDraw(x1, y1, width, height, color)
-draw_rectangle_color(x1, y1, x1 + width - 1, y1 + height - 1, color, color, color, color, false);
-
-//=====================================================================
 // Draw text at position x1, y1, using scale, alpha, align, font and color.
 // line_sep is the vertical separation between text.
 // line_max is the maximum length for a line of text.
@@ -1886,6 +1881,11 @@ if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || (attack == AT_PHONE
         draw_set_alpha(1);
     }
 
+#define rectDraw(x1, y1, width, height, color) // Version 0
+    // Draws a colored rectangle (width and height effective size -1)
+    // =====================================================================
+    draw_rectangle_color(x1, y1, x1 + width - 1, y1 + height - 1, color, color, color, color, false);
+
 #define initIndexes // Version 0
     // Initializes additional grid data indexes for Frame Data overrides.
     // ========================================================================================================
@@ -2568,6 +2568,7 @@ if (attack == AT_TAUNT && joy_pad_idle && phone_practice) || (attack == AT_PHONE
     return newdust;
 
 #define process_dust_queries // Version 0
+    // USED IN: UPDATE event
     // processes all requests within phone_dust_query, spawning their vfx.
     // ========================================================================================================
     if (array_length(phone_dust_query) > 0)

@@ -78,3 +78,9 @@ return input;
     gpu_set_blendmode(bm_normal);
     draw_set_alpha(1);
 }
+
+//=====================================================================
+#define rectDraw(x1, y1, width, height, color)
+// Draws a colored rectangle (width and height effective size -1)
+//=====================================================================
+draw_rectangle_color(x1, y1, x1 + width - 1, y1 + height - 1, color, color, color, color, false);
